@@ -1,6 +1,5 @@
-from django.shortcuts import HttpResponse
+from django.shortcuts import render
 
 
-# Create your views here.
 def index(request):
-    return HttpResponse("Hello world, it is assignment_system app")
+    return render(request, 'assignment_system/index.html')
