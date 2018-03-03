@@ -1,12 +1,11 @@
 from django.test import TestCase
-from assignment_system.models import Assignment, Assignee, AssignmentPriority
+from assignment_system.models import Assignment, Assignee
 from datetime import datetime
 import pytz
 
 
 class AssignmentTestCase(TestCase):
     assignee = None
-    assignment_priority = None
 
     def setUp(self):
         self.assignee = Assignee(
@@ -15,9 +14,6 @@ class AssignmentTestCase(TestCase):
             email="john.doe@gmail.com"
         )
         self.assignee.save()
-
-        self.assignment_priority = AssignmentPriority()
-        self.assignment_priority.save()
 
     def test_assignment_has_correct_props(self):
         title = "Some important assignment"
@@ -31,7 +27,6 @@ class AssignmentTestCase(TestCase):
         stored_assignment = Assignment(
             title=title,
             description=description,
-            priority=self.assignment_priority,
             assigned_at=assigned_at,
             started_at=started_at,
             finished_at=finished_at
@@ -43,7 +38,7 @@ class AssignmentTestCase(TestCase):
 
         self.assertEqual(assignment.title, title)
         self.assertEqual(assignment.description, description)
-        self.assertEqual(assignment.priority.level, AssignmentPriority.LOW)
+        self.assertEqual(assignment.priority_level, Assignment.LOW_PRIORITY)
         self.assertIn(self.assignee, assignment.assignees.all())
         self.assertEqual(assignment.assigned_at, assigned_at)
         self.assertEqual(assignment.started_at, started_at)

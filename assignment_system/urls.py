@@ -8,6 +8,7 @@ urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
         path('signup', views.signUp, name='signup'),
+        # suggest logout for logged in users
         path(
                 'login',
                 auth_views.login,

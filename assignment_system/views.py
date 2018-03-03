@@ -14,6 +14,7 @@ def index(request):
     return render(request, 'assignment_system/index.html')
 
 
+# todo: ugly
 def signUp(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
