@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
 
 urlpatterns = [
+    # todo for LOCAL dev only
+    path('', lambda request: redirect('assignment_system/')),
     path('assignment_system/', include('assignment_system.urls')),
     path('admin/', admin.site.urls),
 ]
