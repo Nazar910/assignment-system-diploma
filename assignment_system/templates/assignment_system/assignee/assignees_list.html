@@ -1,0 +1,9 @@
+{% extends 'assignment_system/layout.html' %}
+{% block content %}
+<h1>Hello from asignees.html</h1>
+<ul class="list-group">
+    {% for assignee in assignees %}
+        <li class="list-group-item">{{assignee.email}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

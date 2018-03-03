@@ -7,6 +7,10 @@ from . import views
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
+        path('assignees', views.assignees_list, name='assignees_list'),
+        path('assignees/<int:id>', views.assignee, name='assignee'),
+        path('assignments', views.assignments_list, name='assignments_list'),
+        # Auth routes
         path('signup', views.signUp, name='signup'),
         # suggest logout for logged in users
         path(
