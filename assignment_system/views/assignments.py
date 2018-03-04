@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseNotFound
 from django.forms import ModelForm
 from django import forms
+from django.contrib.auth.decorators import login_required
 
 from assignment_system.models import Assignment
 
@@ -20,6 +21,7 @@ class AssignmentForm(ModelForm):
         ]
 
 
+@login_required(login_url='/assignment_system/login')
 def assignment_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
@@ -31,6 +33,7 @@ def assignment_list(request):
     )
 
 
+@login_required(login_url='/assignment_system/login')
 def create_assignment(request):
     form = AssignmentForm(request.POST or None)
     if form.is_valid():
@@ -45,6 +48,7 @@ def create_assignment(request):
     # return HttpResponse('create')
 
 
+@login_required(login_url='/assignment_system/login')
 def update_assignment(request, id):
     assignment = get_object_or_404(Assignment, id=id)
     form = AssignmentForm(request.POST or None, instance=assignment)
@@ -60,6 +64,7 @@ def update_assignment(request, id):
     # return HttpResponse('update')
 
 
+@login_required(login_url='/assignment_system/login')
 def delete_assignment(request, id):
     assignment = get_object_or_404(Assignment, id=id)
     if request.method == 'POST':

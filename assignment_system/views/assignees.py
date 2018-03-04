@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseNotFound, HttpResponse
 from django.forms import ModelForm
+from django.contrib.auth.decorators import login_required
 
 from assignment_system.models import Assignee
 
@@ -11,6 +12,7 @@ class AssigneeForm(ModelForm):
         fields = ['name', 'last_name', 'email']
 
 
+@login_required(login_url='/assignment_system/login')
 def assignee_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
@@ -41,6 +43,7 @@ def get_one(request, id):
     )
 
 
+@login_required(login_url='/assignment_system/login')
 def create_assignee(request):
     form = AssigneeForm(request.POST or None)
     if form.is_valid():
@@ -55,6 +58,7 @@ def create_assignee(request):
     # return HttpResponse('create')
 
 
+@login_required(login_url='/assignment_system/login')
 def update_assignee(request, id):
     assignee = get_object_or_404(Assignee, id=id)
     form = AssigneeForm(request.POST or None, instance=assignee)
@@ -70,6 +74,7 @@ def update_assignee(request, id):
     # return HttpResponse('update')
 
 
+@login_required(login_url='/assignment_system/login')
 def delete_assignee(request, id):
     assignee = get_object_or_404(Assignee, id=id)
     if request.method == 'POST':
