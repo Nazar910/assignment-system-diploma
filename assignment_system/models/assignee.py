@@ -8,3 +8,6 @@ class Assignee(models.Model):
 
     def __str__(self):
         return self.name + ' ' + self.last_name
+
+    def __unicode__(self):
+        return self.name + ' ' + self.last_name

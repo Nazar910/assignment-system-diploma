@@ -3,12 +3,24 @@ from django.contrib.auth import views as auth_views
 
 from . import views
 
+assignee_urlpatterns = [
+        path('assignees', views.assignee_list, name='assignee_list'),
+        path('assignees/new', views.create_assignee, name='assignee_new'),
+        path(
+                'assignees/edit/<int:id>',
+                views.update_assignee,
+                name='assignee_edit'
+        ),
+        path(
+                'assignees/delete/<int:id>',
+                views.delete_assignee,
+                name='assignee_delete'
+        )
+]
 
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
-        path('assignees', views.assignees_list, name='assignees_list'),
-        path('assignees/<int:id>', views.assignee, name='assignee'),
         path('assignments', views.assignments_list, name='assignments_list'),
         # Auth routes
         path('signup', views.signUp, name='signup'),
@@ -25,4 +37,4 @@ urlpatterns = [
                 {'template_name': 'assignment_system/logout.html'},
                 name='logout'
         )
-]
+] + assignee_urlpatterns
