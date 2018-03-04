@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseNotFound
 from django.forms import ModelForm
+from django import forms
 
 from assignment_system.models import Assignment
 
 
 class AssignmentForm(ModelForm):
+    assigned_at = forms.DateTimeField(widget=forms.SelectDateWidget())
+    started_at = forms.DateTimeField(widget=forms.SelectDateWidget())
+    finished_at = forms.DateTimeField(widget=forms.SelectDateWidget())
+
     class Meta:
         model = Assignment
         fields = [
