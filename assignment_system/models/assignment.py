@@ -27,3 +27,9 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField()
     finished_at = models.DateTimeField()
+
+    def __str__(self):
+        return self.title
+
+    def __unicode__(self):
+        return self.__str__()

@@ -18,10 +18,24 @@ assignee_urlpatterns = [
         )
 ]
 
+assignment_urlpatterns = [
+        path('assignments', views.assignment_list, name='assignment_list'),
+        path('assignments/new', views.create_assignment, name='assignment_new'),
+        path(
+                'assignments/edit/<int:id>',
+                views.update_assignment,
+                name='assignment_edit'
+        ),
+        path(
+                'assignments/delete/<int:id>',
+                views.delete_assignment,
+                name='assignment_delete'
+        )
+]
+
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
-        path('assignments', views.assignments_list, name='assignments_list'),
         # Auth routes
         path('signup', views.signUp, name='signup'),
         # suggest logout for logged in users
@@ -37,4 +51,4 @@ urlpatterns = [
                 {'template_name': 'assignment_system/logout.html'},
                 name='logout'
         )
-] + assignee_urlpatterns
+] + assignee_urlpatterns + assignment_urlpatterns

@@ -10,4 +10,4 @@ class Assignee(models.Model):
         return self.name + ' ' + self.last_name
 
     def __unicode__(self):
-        return self.name + ' ' + self.last_name
+        return self.__str__()

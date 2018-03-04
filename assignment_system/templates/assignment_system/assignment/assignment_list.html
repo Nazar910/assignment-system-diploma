@@ -1,0 +1,13 @@
+{% extends 'assignment_system/layout.html' %}
+{% block content %}
+<ul class="list-group">
+    {% for assignment in assignments %}
+        <div class="list-group-item">
+            <p>{{assignment.title}}</p>
+            <a href="{% url "assignment_edit" assignment.id %}">Edit</a>
+            <a href="{% url "assignment_delete" assignment.id %}">Delete</a>
+        </div>
+    {% endfor %}
+</ul>
+<a href="{% url "assignment_new" %}">New</a>
+{% endblock %}
