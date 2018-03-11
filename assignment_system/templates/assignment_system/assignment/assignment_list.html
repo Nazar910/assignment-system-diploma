@@ -1,20 +1,73 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<ul class="list-group">
-    {% for assignment in assignments %}
-        <div class="list-group-item" style="width:50%">
-            <!--<p>{{assignment.title}}</p>
-            <a href="{% url "assignment_edit" assignment.id %}">Edit</a>
-            <a href="{% url "assignment_delete" assignment.id %}">Delete</a>-->
-        
-            <a href="{% url "assignment_edit" assignment.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">{{assignment.title}}</h5>
-                </div>
-            </a>
-            <small><a href="{% url "assignment_delete" assignment.id %}">Delete</a></small>
+Пошук
+<select id="search-options">
+    <option value="title">Заголовок</option>
+    <option value="description">Опис</option>
+</select>
+<input type="text" id="search"/>
+<!-- <a href="/assignment_system/assignments/search?title=кур">Пошук</a> -->
+<button id="btn-search">Пошук</button>
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            Створені мною:
+            <ul class="list-group" id="assignments_created_by_me">
+                {% for assignment in assignments_created_by_me %}
+                    <div class="list-group-item" style="width:50%">
+                        <a href="{% url "assignment_edit" assignment.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{assignment.title}}</h5>
+                            </div>
+                        </a>
+                        <small><a href="{% url "assignment_delete" assignment.id %}">Видалити</a></small>
+                        <small><a href="{% url "assignment_template" assignment.id %}">Шаблон</a></small>
+                    </div>
+                {% endfor %}
+            </ul>
         </div>
-    {% endfor %}
-</ul>
-<a href="{% url "assignment_new" %}">New</a>
+        <div class="col-sm">
+            Я є виконавцем:
+            <ul class="list-group" id="assignments_assigned_to_me">
+                {% for assignment in assignments_assigned_to_me %}
+                    <div class="list-group-item" style="width:50%">
+                        <a href="{% url "assignment_edit" assignment.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{assignment.title}}</h5>
+                            </div>
+                        </a>
+                        <small><a href="{% url "assignment_delete" assignment.id %}">Видалити</a></small>
+                        <small><a href="{% url "assignment_template" assignment.id %}">Шаблон</a></small>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<a href="{% url "assignment_new" %}">Додати новий</a>
+{% load static %}
+<script type="text/javascript" src="{% static 'assignment_system/js/jquery-3.3.1.min.js' %}"></script>
+<script>
+    const $search = $('input#search');
+    const $select = $('select#search-options');
+    const $btn = $('button#btn-search');
+    const href = window.location.href;
+    const params = href.split('?')[1];
+    if (params) {
+        const [field, value] = params.slice(0, -1).split('=');
+        $select.val(field);
+        $search.val(decodeURIComponent(value));
+    }
+    $btn.click(function() {
+        const baseUrl = '/assignment_system/assignments';
+        const value = $search.val();
+        if (!value) {
+            window.location.replace(baseUrl);
+            return;
+        }
+        const field = $select.val();
+        const url = `${baseUrl}?${field}=${value};`
+        window.location.replace(url);
+    });
+</script>
 {% endblock %}

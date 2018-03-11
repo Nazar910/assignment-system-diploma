@@ -81,7 +81,12 @@ DATABASES = {
         'USER': 'diploma_project',
         'PASSWORD': 'qwerty',
         'HOST': '0.0.0.0',
-        'PORT': ''
+        'PORT': '',
+        'OPTIONS': {'charset': 'utf8mb4'},
+        'TEST': {
+            'CHARSET': 'utf8',
+            'COLLATION': 'utf8_general_ci',
+        }
     }
 }
 

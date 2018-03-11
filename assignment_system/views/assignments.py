@@ -3,41 +3,137 @@ from django.http import HttpResponseNotFound
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from datetime import datetime
+import json
+from django.core import serializers
 
-from assignment_system.models import Assignment
+from assignment_system.models import Assignment, TaskOwner, Assignee
 
 
 class AssignmentForm(ModelForm):
-    assigned_at = forms.DateTimeField(widget=forms.SelectDateWidget())
-    started_at = forms.DateTimeField(widget=forms.SelectDateWidget())
-    finished_at = forms.DateTimeField(widget=forms.SelectDateWidget())
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control'
+            }
+        ),
+        label='Заголовок'
+    )
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control'
+            }
+        ),
+        label='Опис'
+    )
+    assigned_at = forms.DateTimeField(
+        widget=forms.DateTimeInput(),
+        label="Назначено",
+        initial=datetime.now()
+    )
+    started_at = forms.DateTimeField(
+        widget=forms.DateTimeInput(),
+        label="Розпочато",
+        initial=datetime.now()
+    )
+    finished_at = forms.DateTimeField(
+        widget=forms.DateTimeInput(),
+        label="Закінчено",
+        initial=datetime.now()
+    )
+    attachment = forms.FileField(
+        widget=forms.ClearableFileInput(
+            attrs={
+                'multiple': True
+            }
+        ),
+        label="Вкладення",
+        required=False
+    )
+    priority_level = forms.CharField(
+        widget=forms.Select(choices=Assignment.PRIORITIES),
+        label='Пріорітет'
+    )
 
     class Meta:
         model = Assignment
         fields = [
             'title', 'description', 'assignees',
             'priority_level', 'assigned_at',
-            'started_at', 'finished_at'
+            'started_at', 'finished_at', 'attachment'
         ]
+
+
+def get_all(user):
+    task_owner = TaskOwner.objects.get(email=user.email)
+    assignee = Assignee.objects.get(email=user.email)
+    assignments_assigned_to_me = None
+    if assignee:
+        assignments_assigned_to_me = assignee.assignment_set \
+            .all() \
+            .exclude(task_owner=task_owner)
+
+    assignments_created_by_me = Assignment.objects \
+        .filter(task_owner=task_owner)
+
+    return {
+        'assignments_created_by_me': assignments_created_by_me,
+        'assignments_assigned_to_me': assignments_assigned_to_me
+    }
+
+
+def filter_by_title(user, title):
+    task_owner = TaskOwner.objects.get(email=user.email)
+    assignee = Assignee.objects.get(email=user.email)
+    assignments_assigned_to_me = None
+    if assignee:
+        assignments_assigned_to_me = assignee.assignment_set \
+            .all() \
+            .exclude(task_owner=task_owner) \
+            .filter(title__istartswith=title.lower())
+
+    assignments_created_by_me = Assignment.objects \
+        .filter(task_owner=task_owner) \
+        .filter(title__istartswith=title.lower())
+
+    return {
+        'assignments_created_by_me': assignments_created_by_me,
+        'assignments_assigned_to_me': assignments_assigned_to_me
+    }
 
 
 @login_required(login_url='/assignment_system/login')
 def assignment_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    assignments = Assignment.objects.all()
+    user = request.user
+
+    context = None
+    title = request.GET.get('title')
+    if title:
+        context = filter_by_title(user, title)
+    else:
+        context = get_all(user)
+
     return render(
         request,
         'assignment_system/assignment/assignment_list.html',
-        {'assignments': assignments}
+        context
     )
 
 
 @login_required(login_url='/assignment_system/login')
 def create_assignment(request):
     form = AssignmentForm(request.POST or None)
+    print(form)
     if form.is_valid():
-        form.save()
+        assignment = form.save()
+        user = request.user
+        task_owner = TaskOwner.objects.get(email=user.email)
+        assignment.task_owner = task_owner
+        assignment.save()
         # consider redirecting to get_one or something
         return redirect('assignment_list')
     return render(
@@ -76,3 +172,19 @@ def delete_assignment(request, id):
         {'object': assignment}
     )
     # return HttpResponse('delete')
+
+
+@login_required(login_url='/assignment_system/login')
+def show_assignment_template(request, id):
+    assignment = get_object_or_404(Assignment, id=id)
+    assignees = assignment.assignees.all()
+    return render(
+        request,
+        'assignment_system/assignment/assignment_template.html',
+        {
+            'assignment': assignment,
+            'created_at': assignment.created_at.strftime("%d.%m.%Y"),
+            'assignees': assignees,
+            'position': assignment.task_owner.position
+        }
+    )
