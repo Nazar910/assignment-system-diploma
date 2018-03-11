@@ -96,4 +96,7 @@ urlpatterns = [
                 {'template_name': 'assignment_system/logout.html'},
                 name='logout'
         )
-] + assignee_urlpatterns + assignment_urlpatterns + post_urlpatterns + directive_urlpatterns
+] + assignee_urlpatterns \
+ + assignment_urlpatterns \
+ + post_urlpatterns \
+ + directive_urlpatterns

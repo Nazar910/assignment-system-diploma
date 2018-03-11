@@ -36,7 +36,15 @@ class PostForm(ModelForm):
 def post_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    posts = Post.objects.all()
+    posts = None
+    title = request.GET.get('title')
+    description = request.GET.get('description')
+    if title:
+        posts = Post.objects.filter(title__istartswith=title)
+    elif description:
+        posts = Post.objects.filter(description__istartswith=description)
+    else:
+        posts = Post.objects.all()
     return render(
         request,
         'assignment_system/post/post_list.html',
