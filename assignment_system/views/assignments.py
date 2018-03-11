@@ -5,8 +5,6 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from datetime import datetime
-import json
-from django.core import serializers
 
 from assignment_system.models import Assignment, TaskOwner, Assignee
 
