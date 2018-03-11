@@ -1,8 +1,13 @@
 from django.db import models
 from .assignee import Assignee
+from .taskowner import TaskOwner
 
 
 class Assignment(models.Model):
+    task_owner = models.ForeignKey(
+        TaskOwner,
+        on_delete=models.CASCADE
+    )
     title = models.CharField(max_length=50)
     description = models.TextField()
     assignees = models.ManyToManyField(Assignee)
