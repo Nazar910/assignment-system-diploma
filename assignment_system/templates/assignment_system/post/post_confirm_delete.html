@@ -1,9 +1,8 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<form method="post" enctype="multipart/form-data">
+<form method="post">
     {% csrf_token %}
-    {{ form.media }}
-    {{ form.as_p }}
+    Ви впевнені, що хочете видалити "{{object}}" ?
     <input type="submit" value="Submit"/>
 </form>
 {% endblock %}

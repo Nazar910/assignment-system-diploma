@@ -8,16 +8,30 @@ from assignment_system.models import Assignment, TaskOwner
 
 
 class AssignmentForm(ModelForm):
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control'
+            }
+        )
+    )
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control'
+            }
+        )
+    )
     assigned_at = forms.DateTimeField(
-        widget=forms.SelectDateWidget(),
+        widget=forms.SplitDateTimeWidget(),
         label="Назначено"
     )
     started_at = forms.DateTimeField(
-        widget=forms.SelectDateWidget(),
+        widget=forms.SplitDateTimeWidget(),
         label="Розпочато"
     )
     finished_at = forms.DateTimeField(
-        widget=forms.SelectDateWidget(),
+        widget=forms.SplitDateTimeWidget(),
         label="Закінчено"
     )
     attachment = forms.FileField(
@@ -105,7 +119,7 @@ def delete_assignment(request, id):
 
 
 @login_required(login_url='/assignment_system/login')
-def show_template(request, id):
+def show_assignment_template(request, id):
     assignment = get_object_or_404(Assignment, id=id)
     assignees = assignment.assignees.all()
     user = request.user

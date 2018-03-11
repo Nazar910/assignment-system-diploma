@@ -28,13 +28,33 @@ assignment_urlpatterns = [
         ),
         path(
                 'assignments/template/<int:id>',
-                views.show_template,
+                views.show_assignment_template,
                 name='assignment_template'
         ),
         path(
                 'assignments/delete/<int:id>',
                 views.delete_assignment,
                 name='assignment_delete'
+        )
+]
+
+post_urlpatterns = [
+        path('posts', views.post_list, name='post_list'),
+        path('posts/new', views.create_post, name='post_new'),
+        path(
+                'posts/edit/<int:id>',
+                views.update_post,
+                name='post_edit'
+        ),
+        path(
+                'posts/template/<int:id>',
+                views.show_post_template,
+                name='post_template'
+        ),
+        path(
+                'posts/delete/<int:id>',
+                views.delete_post,
+                name='post_delete'
         )
 ]
 
@@ -56,4 +76,4 @@ urlpatterns = [
                 {'template_name': 'assignment_system/logout.html'},
                 name='logout'
         )
-] + assignee_urlpatterns + assignment_urlpatterns
+] + assignee_urlpatterns + assignment_urlpatterns + post_urlpatterns
