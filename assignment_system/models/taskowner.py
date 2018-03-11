@@ -6,6 +6,7 @@ class TaskOwner(models.Model):
     last_name = models.CharField(max_length=30)
     patronymic = models.CharField(max_length=30)
     email = models.EmailField()
+    position = models.TextField()
 
     def __str__(self):
         return self.name + ' ' + self.last_name

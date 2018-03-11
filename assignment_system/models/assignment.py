@@ -6,11 +6,14 @@ from .taskowner import TaskOwner
 class Assignment(models.Model):
     task_owner = models.ForeignKey(
         TaskOwner,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        # shitty
+        blank=True,
+        null=True
     )
-    title = models.CharField(max_length=50)
-    description = models.TextField()
-    assignees = models.ManyToManyField(Assignee)
+    title = models.CharField('Заголовок', max_length=50)
+    description = models.TextField('Опис')
+    assignees = models.ManyToManyField(Assignee, verbose_name='Виконувачі')
     "Priority level"
     LOW_PRIORITY = 'l'
     MEDIUM_PRIORITY = 'm'

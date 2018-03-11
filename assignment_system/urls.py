@@ -27,6 +27,11 @@ assignment_urlpatterns = [
                 name='assignment_edit'
         ),
         path(
+                'assignments/template/<int:id>',
+                views.show_template,
+                name='assignment_template'
+        ),
+        path(
                 'assignments/delete/<int:id>',
                 views.delete_assignment,
                 name='assignment_delete'

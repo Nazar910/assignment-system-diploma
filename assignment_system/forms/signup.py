@@ -6,7 +6,7 @@ from assignment_system.models.taskowner import TaskOwner
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(
-        max_length=30, required=False,
+        max_length=30,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control'
@@ -15,7 +15,7 @@ class SignUpForm(UserCreationForm):
         label='Ім\'я'
     )
     last_name = forms.CharField(
-        max_length=30, required=False, help_text='Optional.',
+        max_length=30,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control'
@@ -24,13 +24,21 @@ class SignUpForm(UserCreationForm):
         label='Прізвище'
     )
     patronymic = forms.CharField(
-        max_length=30, required=False, help_text='Optional.',
+        max_length=30,
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control'
             }
         ),
         label='Побатькові'
+    )
+    position = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control'
+            }
+        ),
+        label='Посада'
     )
     email = forms.EmailField(
         max_length=254, help_text='Введіть коректну email-адресу.',
@@ -62,6 +70,7 @@ class SignUpForm(UserCreationForm):
         'first_name',
         'last_name',
         'patronymic',
+        'position',
         'email',
         'password1',
         'password2',
@@ -84,6 +93,7 @@ class SignUpForm(UserCreationForm):
             name=user.first_name,
             last_name=user.last_name,
             patronymic=self.cleaned_data['patronymic'],
+            position=self.cleaned_data['position'],
             email=user.email
         )
 
