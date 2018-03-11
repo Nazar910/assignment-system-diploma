@@ -12,10 +12,10 @@ class Assignment(models.Model):
     HIGH_PRIORITY = 'h'
     UGRENT_PRIORITY = 'u'
     PRIORITIES = (
-        (LOW_PRIORITY, 'Low'),
-        (MEDIUM_PRIORITY, 'Medium'),
-        (HIGH_PRIORITY, 'High'),
-        (UGRENT_PRIORITY, 'Urgent')
+        (LOW_PRIORITY, 'НИЗЬКИЙ'),
+        (MEDIUM_PRIORITY, 'СЕРЕДНІЙ'),
+        (HIGH_PRIORITY, 'ВИСОКИЙ'),
+        (UGRENT_PRIORITY, 'ТЕРМІНОВО')
     )
     priority_level = models.CharField(
         max_length=6,
@@ -27,6 +27,8 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField()
     finished_at = models.DateTimeField()
+
+    attachment = models.FileField(blank=True, null=True)
 
     def __str__(self):
         return self.title

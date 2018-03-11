@@ -12,9 +12,9 @@
                   <h5 class="mb-1">{{assignment.title}}</h5>
                 </div>
             </a>
-            <small><a href="{% url "assignment_delete" assignment.id %}">Delete</a></small>
+            <small><a href="{% url "assignment_delete" assignment.id %}">Видалити</a></small>
         </div>
     {% endfor %}
 </ul>
-<a href="{% url "assignment_new" %}">New</a>
+<a href="{% url "assignment_new" %}">Додати новий</a>
 {% endblock %}

@@ -11,13 +11,20 @@ class AssignmentForm(ModelForm):
     assigned_at = forms.DateTimeField(widget=forms.SelectDateWidget())
     started_at = forms.DateTimeField(widget=forms.SelectDateWidget())
     finished_at = forms.DateTimeField(widget=forms.SelectDateWidget())
+    attachment = forms.FileField(
+        widget=forms.ClearableFileInput(
+            attrs={
+                'multiple': True
+            }
+        )
+    )
 
     class Meta:
         model = Assignment
         fields = [
             'title', 'description', 'assignees',
             'priority_level', 'assigned_at',
-            'started_at', 'finished_at'
+            'started_at', 'finished_at', 'attachment'
         ]
 
 
