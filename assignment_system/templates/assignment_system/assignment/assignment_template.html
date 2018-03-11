@@ -3,7 +3,8 @@
 <a href="{% url "assignment_list" %}">Назад</a>
 <br/>
 <br/>
-<div class="container">
+<button id="print">Друк</button>
+<div class="container" id="template">
     <div class="text-center">ДОРУЧЕННЯ</div>
     <br/>
     <br/>
@@ -18,9 +19,16 @@
     <br/>
     <br/>
     {{ position }}<br/>
+    {{ assignment.task_owner.name }} {{ assignment.task_owner.last_name }}<br/>
     {{created_at}}
 </div>
-
+<script>
+    const button = document.getElementById('print');
+    //bug: works only ones until reload
+    button.onclick = function() {
+        printDiv('template');
+    }
+</script>
 <br/>
 <br/>
 {% endblock %}
