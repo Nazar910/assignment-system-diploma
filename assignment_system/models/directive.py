@@ -1,4 +1,5 @@
 from django.db import models
+from .taskowner import TaskOwner
 
 
 class Directive(models.Model):
@@ -7,6 +8,14 @@ class Directive(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     attachment = models.FileField(blank=True, null=True)
+
+    task_owner = models.ForeignKey(
+        TaskOwner,
+        on_delete=models.CASCADE,
+        # shitty
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.title

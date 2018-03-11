@@ -122,8 +122,6 @@ def delete_assignment(request, id):
 def show_assignment_template(request, id):
     assignment = get_object_or_404(Assignment, id=id)
     assignees = assignment.assignees.all()
-    user = request.user
-    task_owner = get_object_or_404(TaskOwner, email=user.email)
     return render(
         request,
         'assignment_system/assignment/assignment_template.html',
@@ -131,6 +129,6 @@ def show_assignment_template(request, id):
             'assignment': assignment,
             'created_at': assignment.created_at.strftime("%d.%m.%Y"),
             'assignees': assignees,
-            'position': task_owner.position
+            'position': assignment.task_owner.position
         }
     )

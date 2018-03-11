@@ -4,10 +4,25 @@ from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.decorators import login_required
 
-from assignment_system.models import Post
+from assignment_system.models import Post, TaskOwner
 
 
 class PostForm(ModelForm):
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control'
+            }
+        )
+    )
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control'
+            }
+        )
+    )
+
     class Meta:
         model = Post
         fields = [
@@ -19,11 +34,11 @@ class PostForm(ModelForm):
 def post_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    assignments = Post.objects.all()
+    posts = Post.objects.all()
     return render(
         request,
         'assignment_system/post/post_list.html',
-        {'assignments': assignments}
+        {'posts': posts}
     )
 
 
@@ -31,7 +46,11 @@ def post_list(request):
 def create_post(request):
     form = PostForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        post = form.save()
+        user = request.user
+        task_owner = TaskOwner.objects.get(email=user.email)
+        post.task_owner = task_owner
+        post.save()
         # consider redirecting to get_one or something
         return redirect('post_list')
     return render(

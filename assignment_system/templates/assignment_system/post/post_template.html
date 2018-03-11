@@ -1,20 +1,17 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<a href="{% url "assignment_list" %}">Назад</a>
+<a href="{% url "post_list" %}">Назад</a>
 <br/>
 <br/>
 <div class="container">
-    <div class="text-center">ДОРУЧЕННЯ</div>
+    <div class="text-center">ІНФОРМУЮ</div>
     <br/>
     <br/>
-    <div class="text-center">{{assignment.title}}</div>
+    <div class="text-center">{{post.title}}</div>
     <br/>
     <br/>
-    Я, {{ assignment.task_owner.name }} {{ assignment.task_owner.last_name }},
-    доручаю {{ assignment.description }} наступним особам:
-    {% for assignee in assignees %}
-        {{assignee}}
-    {% endfor %}.
+    Я, {{ post.task_owner.name }} {{ post.task_owner.last_name }},
+    інформую, що {{ post.description }}.
     <br/>
     <br/>
     {{ position }}<br/>
