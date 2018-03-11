@@ -1,0 +1,8 @@
+{% extends 'assignment_system/layout.html' %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    Ви впевнені, що хочете видалити "{{object}}" ?
+    <input type="submit" value="Підтвердити"/>
+</form>
+{% endblock %}

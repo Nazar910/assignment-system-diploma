@@ -3,8 +3,10 @@ from django.http import HttpResponseNotFound
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from datetime import datetime
 
-from assignment_system.models import Assignment, TaskOwner
+from assignment_system.models import Assignment, TaskOwner, Assignee
 
 
 class AssignmentForm(ModelForm):
@@ -25,16 +27,19 @@ class AssignmentForm(ModelForm):
         label='Опис'
     )
     assigned_at = forms.DateTimeField(
-        widget=forms.SplitDateTimeWidget(),
-        label="Назначено"
+        widget=forms.DateTimeInput(),
+        label="Назначено",
+        initial=datetime.now()
     )
     started_at = forms.DateTimeField(
-        widget=forms.SplitDateTimeWidget(),
-        label="Розпочато"
+        widget=forms.DateTimeInput(),
+        label="Розпочато",
+        initial=datetime.now()
     )
     finished_at = forms.DateTimeField(
-        widget=forms.SplitDateTimeWidget(),
-        label="Закінчено"
+        widget=forms.DateTimeInput(),
+        label="Закінчено",
+        initial=datetime.now()
     )
     attachment = forms.FileField(
         widget=forms.ClearableFileInput(
@@ -63,17 +68,31 @@ class AssignmentForm(ModelForm):
 def assignment_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    assignments = Assignment.objects.all()
+    user = request.user
+    task_owner = TaskOwner.objects.get(email=user.email)
+    assignee = Assignee.objects.get(email=user.email)
+    assignments_assigned_to_me = None
+    if assignee:
+        assignments_assigned_to_me = assignee.assignment_set \
+            .all() \
+            .exclude(task_owner=task_owner)
+
+    assignments_created_by_me = Assignment.objects \
+        .filter(task_owner=task_owner)
     return render(
         request,
         'assignment_system/assignment/assignment_list.html',
-        {'assignments': assignments}
+        {
+            'assignments_created_by_me': assignments_created_by_me,
+            'assignments_assigned_to_me': assignments_assigned_to_me
+        }
     )
 
 
 @login_required(login_url='/assignment_system/login')
 def create_assignment(request):
     form = AssignmentForm(request.POST or None)
+    print(form)
     if form.is_valid():
         assignment = form.save()
         user = request.user

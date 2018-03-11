@@ -58,6 +58,26 @@ post_urlpatterns = [
         )
 ]
 
+directive_urlpatterns = [
+        path('directives', views.directive_list, name='directive_list'),
+        path('directives/new', views.create_directive, name='directive_new'),
+        path(
+                'directives/edit/<int:id>',
+                views.update_directive,
+                name='directive_edit'
+        ),
+        path(
+                'directives/template/<int:id>',
+                views.show_directive_template,
+                name='directive_template'
+        ),
+        path(
+                'directives/delete/<int:id>',
+                views.delete_directive,
+                name='directive_delete'
+        )
+]
+
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
@@ -76,4 +96,4 @@ urlpatterns = [
                 {'template_name': 'assignment_system/logout.html'},
                 name='logout'
         )
-] + assignee_urlpatterns + assignment_urlpatterns + post_urlpatterns
+] + assignee_urlpatterns + assignment_urlpatterns + post_urlpatterns + directive_urlpatterns

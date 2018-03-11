@@ -1,0 +1,23 @@
+{% extends 'assignment_system/layout.html' %}
+{% block content %}
+<a href="{% url "directive_list" %}">Назад</a>
+<br/>
+<br/>
+<div class="container">
+    <div class="text-center">РОЗПОРЯДЖЕННЯ</div>
+    <br/>
+    <br/>
+    <div class="text-center">{{directive.title}}</div>
+    <br/>
+    <br/>
+    {{ directive.description }}.
+    <br/>
+    <br/>
+    {{ directive.task_owner.position }}<br/>
+    {{ directive.task_owner.name }} {{ directive.task_owner.last_name }}<br/>
+    {{created_at}}
+</div>
+
+<br/>
+<br/>
+{% endblock %}
