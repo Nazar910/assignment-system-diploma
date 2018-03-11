@@ -13,14 +13,16 @@ class AssignmentForm(ModelForm):
             attrs={
                 'class': 'form-control'
             }
-        )
+        ),
+        label='Заголовок'
     )
     description = forms.CharField(
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control'
             }
-        )
+        ),
+        label='Опис'
     )
     assigned_at = forms.DateTimeField(
         widget=forms.SplitDateTimeWidget(),

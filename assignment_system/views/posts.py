@@ -13,14 +13,16 @@ class PostForm(ModelForm):
             attrs={
                 'class': 'form-control'
             }
-        )
+        ),
+        label='Заголовок'
     )
     description = forms.CharField(
         widget=forms.Textarea(
             attrs={
                 'class': 'form-control'
             }
-        )
+        ),
+        label='Опис'
     )
 
     class Meta:
