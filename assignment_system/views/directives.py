@@ -36,7 +36,16 @@ class DirectiveForm(ModelForm):
 def directive_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    directives = Directive.objects.all()
+    directives = None
+    title = request.GET.get('title')
+    description = request.GET.get('description')
+    if title:
+        directives = Directive.objects.filter(title__istartswith=title)
+    elif description:
+        directives = Directive.objects \
+                        .filter(description__istartswith=description)
+    else:
+        directives = Directive.objects.all()
     return render(
         request,
         'assignment_system/directive/directive_list.html',

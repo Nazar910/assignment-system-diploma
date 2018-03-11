@@ -1,5 +1,11 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
+<select id="search-options">
+    <option value="title">Заголовок</option>
+    <option value="description">Опис</option>
+</select>
+<input type="text" id="search"/>
+<button id="btn-search">Пошук</button>
 <ul class="list-group">
     {% for directive in directives %}
         <div class="list-group-item" style="width:50%">
@@ -14,4 +20,29 @@
     {% endfor %}
 </ul>
 <a href="{% url "directive_new" %}">Додати новий</a>
+{% load static %}
+<script type="text/javascript" src="{% static 'assignment_system/js/jquery-3.3.1.min.js' %}"></script>
+<script>
+    const $search = $('input#search');
+    const $select = $('select#search-options');
+    const $btn = $('button#btn-search');
+    const href = window.location.href;
+    const params = href.split('?')[1];
+    if (params) {
+        const [field, value] = params.slice(0, -1).split('=');
+        $select.val(field);
+        $search.val(decodeURIComponent(value));
+    }
+    $btn.click(function() {
+        const baseUrl = '/assignment_system/directives';
+        const value = $search.val();
+        if (!value) {
+            window.location.replace(baseUrl);
+            return;
+        }
+        const field = $select.val();
+        const url = `${baseUrl}?${field}=${value};`
+        window.location.replace(url);
+    });
+</script>
 {% endblock %}
