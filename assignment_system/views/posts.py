@@ -36,9 +36,7 @@ class PostForm(ModelForm):
 def post_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    user = request.user
-    task_owner = TaskOwner.objects.get(email=user.email)
-    posts = Post.objects.filter(task_owner=task_owner)
+    posts = Post.objects.all()
     return render(
         request,
         'assignment_system/post/post_list.html',

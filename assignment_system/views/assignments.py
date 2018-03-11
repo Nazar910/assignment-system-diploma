@@ -5,6 +5,8 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from datetime import datetime
+import json
+from django.core import serializers
 
 from assignment_system.models import Assignment, TaskOwner, Assignee
 
@@ -64,11 +66,7 @@ class AssignmentForm(ModelForm):
         ]
 
 
-@login_required(login_url='/assignment_system/login')
-def assignment_list(request):
-    if request.method != 'GET':
-        return HttpResponseNotFound('Not found!')
-    user = request.user
+def get_all(user):
     task_owner = TaskOwner.objects.get(email=user.email)
     assignee = Assignee.objects.get(email=user.email)
     assignments_assigned_to_me = None
@@ -79,13 +77,50 @@ def assignment_list(request):
 
     assignments_created_by_me = Assignment.objects \
         .filter(task_owner=task_owner)
+
+    return {
+        'assignments_created_by_me': assignments_created_by_me,
+        'assignments_assigned_to_me': assignments_assigned_to_me
+    }
+
+
+def filter_by_title(user, title):
+    task_owner = TaskOwner.objects.get(email=user.email)
+    assignee = Assignee.objects.get(email=user.email)
+    assignments_assigned_to_me = None
+    if assignee:
+        assignments_assigned_to_me = assignee.assignment_set \
+            .all() \
+            .exclude(task_owner=task_owner) \
+            .filter(title__istartswith=title.lower())
+
+    assignments_created_by_me = Assignment.objects \
+        .filter(task_owner=task_owner) \
+        .filter(title__istartswith=title.lower())
+
+    return {
+        'assignments_created_by_me': assignments_created_by_me,
+        'assignments_assigned_to_me': assignments_assigned_to_me
+    }
+
+
+@login_required(login_url='/assignment_system/login')
+def assignment_list(request):
+    if request.method != 'GET':
+        return HttpResponseNotFound('Not found!')
+    user = request.user
+
+    context = None
+    title = request.GET.get('title')
+    if title:
+        context = filter_by_title(user, title)
+    else:
+        context = get_all(user)
+
     return render(
         request,
         'assignment_system/assignment/assignment_list.html',
-        {
-            'assignments_created_by_me': assignments_created_by_me,
-            'assignments_assigned_to_me': assignments_assigned_to_me
-        }
+        context
     )
 
 
