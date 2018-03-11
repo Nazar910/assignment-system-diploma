@@ -104,6 +104,26 @@ def filter_by_title(user, title):
     }
 
 
+def filter_by_description(user, description):
+    task_owner = TaskOwner.objects.get(email=user.email)
+    assignee = Assignee.objects.get(email=user.email)
+    assignments_assigned_to_me = None
+    if assignee:
+        assignments_assigned_to_me = assignee.assignment_set \
+            .all() \
+            .exclude(task_owner=task_owner) \
+            .filter(description__istartswith=description.lower())
+
+    assignments_created_by_me = Assignment.objects \
+        .filter(task_owner=task_owner) \
+        .filter(description__istartswith=description.lower())
+
+    return {
+        'assignments_created_by_me': assignments_created_by_me,
+        'assignments_assigned_to_me': assignments_assigned_to_me
+    }
+
+
 @login_required(login_url='/assignment_system/login')
 def assignment_list(request):
     if request.method != 'GET':
@@ -112,8 +132,11 @@ def assignment_list(request):
 
     context = None
     title = request.GET.get('title')
+    description = request.GET.get('description')
     if title:
         context = filter_by_title(user, title)
+    elif description:
+        context = filter_by_description(user, description)
     else:
         context = get_all(user)
 
