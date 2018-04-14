@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "webpack -w",
+    "ensure_dist": "mkdir -p dist",
+    "webpack_watch": "./node_modules/.bin/webpack -w",
+    "watch": "npm run ensure_dist && npm run webpack_watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
