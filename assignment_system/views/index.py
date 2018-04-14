@@ -3,11 +3,21 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 
 from assignment_system.forms import SignUpForm
+from assignment_system.models import Assignment, TaskOwner
 
 
 @login_required(login_url='/assignment_system/login')
 def home(request):
-    return render(request, 'assignment_system/home.html')
+    user = request.user
+    task_owner = TaskOwner.objects.get(email=user.email)
+    return render(
+        request,
+        'assignment_system/home.html',
+        {
+            'first_name': user.first_name,
+            'patronymic': task_owner.patronymic,
+            'username': user.username
+        })
 
 
 def index(request):

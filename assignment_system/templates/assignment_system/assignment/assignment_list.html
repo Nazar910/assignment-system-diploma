@@ -1,25 +1,26 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<select id="search-options">
-    <option value="title">Заголовок</option>
-    <option value="description">Опис</option>
-</select>
-<input type="text" id="search"/>
-<button id="btn-search">Пошук</button>
 <div class="container">
+    <a href="{% url "assignment_new" %}" class="btn btn-primary">Додати новий</a><br/>
+    <select id="search-options">
+        <option value="title">Заголовок</option>
+        <option value="description">Опис</option>
+    </select>
+    <input type="text" id="search"/>
+    <button id="btn-search" class="btn btn-primary">Пошук</button>
     <div class="row">
         <div class="col-sm">
             Створені мною:
             <ul class="list-group" id="assignments_created_by_me">
                 {% for assignment in assignments_created_by_me %}
-                    <div class="list-group-item" style="width:50%">
+                    <div class="list-group-item" style="width:80%">
                         <a href="{% url "assignment_edit" assignment.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">{{assignment.title}}</h5>
                             </div>
                         </a>
+                        <small><a href="{% url "assignment_template" assignment.id %}">Шаблон</a></small>|
                         <small><a href="{% url "assignment_delete" assignment.id %}">Видалити</a></small>
-                        <small><a href="{% url "assignment_template" assignment.id %}">Шаблон</a></small>
                     </div>
                 {% endfor %}
             </ul>
@@ -28,21 +29,20 @@
             Я є виконавцем:
             <ul class="list-group" id="assignments_assigned_to_me">
                 {% for assignment in assignments_assigned_to_me %}
-                    <div class="list-group-item" style="width:50%">
+                    <div class="list-group-item" style="width:80%">
                         <a href="{% url "assignment_edit" assignment.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">{{assignment.title}}</h5>
                             </div>
                         </a>
+                        <small><a href="{% url "assignment_template" assignment.id %}">Шаблон</a></small>|
                         <small><a href="{% url "assignment_delete" assignment.id %}">Видалити</a></small>
-                        <small><a href="{% url "assignment_template" assignment.id %}">Шаблон</a></small>
                     </div>
                 {% endfor %}
             </ul>
         </div>
     </div>
 </div>
-<a href="{% url "assignment_new" %}">Додати новий</a>
 {% load static %}
 <script type="text/javascript" src="{% static 'assignment_system/js/jquery-3.3.1.min.js' %}"></script>
 <script>

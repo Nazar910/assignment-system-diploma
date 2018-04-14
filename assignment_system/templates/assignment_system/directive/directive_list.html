@@ -1,25 +1,27 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<select id="search-options">
-    <option value="title">Заголовок</option>
-    <option value="description">Опис</option>
-</select>
-<input type="text" id="search"/>
-<button id="btn-search">Пошук</button>
-<ul class="list-group">
-    {% for directive in directives %}
-        <div class="list-group-item" style="width:50%">
-            <a href="{% url "directive_edit" directive.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">{{directive.title}}</h5>
-                </div>
-            </a>
-            <small><a href="{% url "directive_delete" directive.id %}">Видалити</a></small>
-            <small><a href="{% url "directive_template" directive.id %}">Шаблон</a></small>
-        </div>
-    {% endfor %}
-</ul>
-<a href="{% url "directive_new" %}">Додати новий</a>
+<div class="container">
+    <a href="{% url "directive_new" %}" class="btn btn-primary">Додати новий</a><br/>
+    <select id="search-options">
+        <option value="title">Заголовок</option>
+        <option value="description">Опис</option>
+    </select>
+    <input type="text" id="search"/>
+    <button id="btn-search" class="btn btn-primary">Пошук</button>
+    <ul class="list-group">
+        {% for directive in directives %}
+            <div class="list-group-item" style="width:50%">
+                <a href="{% url "directive_edit" directive.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{directive.title}}</h5>
+                    </div>
+                </a>
+                <small><a href="{% url "directive_template" directive.id %}">Шаблон</a></small>|
+                <small><a href="{% url "directive_delete" directive.id %}">Видалити</a></small>
+            </div>
+        {% endfor %}
+    </ul>
+</div>
 {% load static %}
 <script type="text/javascript" src="{% static 'assignment_system/js/jquery-3.3.1.min.js' %}"></script>
 <script>

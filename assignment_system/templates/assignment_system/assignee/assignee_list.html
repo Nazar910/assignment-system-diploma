@@ -1,20 +1,18 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<ul class="list-group">
-    {% for assignee in assignees %}
-        <div class="list-group-item" style="width:50%">
-            <!--<p>{{assignee.email}}</p>
-            <a href="{% url "assignee_edit" assignee.id %}">Edit</a>
-            <a href="{% url "assignee_delete" assignee.id %}">Delete</a>-->
-
-            <a href="{% url "assignee_edit" assignee.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">{{assignee.email}}</h5>
-                </div>
-            </a>
-            <small><a href="{% url "assignee_delete" assignee.id %}">Delete</a></small>
-        </div>
-    {% endfor %}
-</ul>
-<a href="{% url "assignee_new" %}">New</a>
+<div class="container">
+    <a href="{% url "assignee_new" %}" class="btn btn-primary">Додати</a>
+    <ul class="list-group">
+        {% for assignee in assignees %}
+            <div class="list-group-item" style="width:50%">
+                <a href="{% url "assignee_edit" assignee.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{assignee.last_name}} {{assignee.name}}</h5>
+                    </div>
+                </a>
+                <small><a href="{% url "assignee_delete" assignee.id %}">Видалити</a></small>
+            </div>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

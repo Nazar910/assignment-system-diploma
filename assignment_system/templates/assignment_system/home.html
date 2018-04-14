@@ -1,4 +1,8 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<h1>Домашня сторінка</h1>
+<h1>Вітаю, {{ first_name }} {{ patronymic }}</h1>
+Ваш username {{ username }}. Використовуйте його і Ваш пароль для авторизації.
+<div id="home-page"></div>
+{% load static %}
+<script type="text/javascript" src="{% static 'assignment_system/js/react-app/dist/bundle.js' %}"></script>
 {% endblock %}

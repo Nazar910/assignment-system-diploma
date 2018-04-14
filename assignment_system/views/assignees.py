@@ -2,11 +2,37 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseNotFound, HttpResponse
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
+from django import forms
 
 from assignment_system.models import Assignee
 
 
 class AssigneeForm(ModelForm):
+    name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control'
+            }
+        ),
+        label='Ім\'я'
+    )
+    last_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control'
+            }
+        ),
+        label='Прізвище'
+    )
+    email = forms.EmailField(
+        max_length=254, help_text='Введіть коректну email-адресу.',
+        widget=forms.EmailInput(
+            attrs={
+                'class': 'form-control',
+            }
+        )
+    )
+
     class Meta:
         model = Assignee
         fields = ['name', 'last_name', 'email']

@@ -131,6 +131,7 @@ def assignment_list(request):
     context = None
     title = request.GET.get('title')
     description = request.GET.get('description')
+    date = request.GET.get('date')
     if title:
         context = filter_by_title(user, title)
     elif description:

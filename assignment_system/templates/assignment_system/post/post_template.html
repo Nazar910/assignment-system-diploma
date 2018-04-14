@@ -3,7 +3,8 @@
 <a href="{% url "post_list" %}">Назад</a>
 <br/>
 <br/>
-<div class="container">
+<button id="print">Друк</button>
+<div class="container" id="template">
     <div class="text-center">ІНФОРМУЮ</div>
     <br/>
     <br/>
@@ -20,4 +21,11 @@
 
 <br/>
 <br/>
+<script>
+    const button = document.getElementById('print');
+    //bug: works only ones until reload
+    button.onclick = function() {
+        printDiv('template');
+    }
+</script>
 {% endblock %}
