@@ -9,3 +9,4 @@ from .posts import post_list, create_post, update_post, \
 from .directives import directive_list, create_directive, \
                         update_directive, delete_directive, \
                         show_directive_template
+from .assignments_finished import assignments_finished_list

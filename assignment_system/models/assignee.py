@@ -23,6 +23,8 @@ class Assignee(models.Model):
         default=JUST_ASSIGNEE
     )
 
+    position = models.TextField(default='викладач')
+
     def __str__(self):
         return self.name + ' ' + self.last_name
 

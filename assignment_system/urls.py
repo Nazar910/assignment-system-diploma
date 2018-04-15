@@ -78,6 +78,10 @@ directive_urlpatterns = [
         )
 ]
 
+assignments_finished_urlpatterns = [
+        path('assignments_finished', views.assignments_finished_list, name='assignments_finished_list')
+]
+
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
@@ -100,4 +104,5 @@ urlpatterns = [
 ] + assignee_urlpatterns \
  + assignment_urlpatterns \
  + post_urlpatterns \
- + directive_urlpatterns
+ + directive_urlpatterns \
+ + assignments_finished_urlpatterns

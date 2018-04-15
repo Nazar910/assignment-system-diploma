@@ -21,32 +21,41 @@ class AssignmentAssignee extends Component {
         super(props);
 
         this.state = {
-            assignees: [],
             assignments: [],
-            tableReference: new Map()
+            assignees: [],
+            tableReference: new Map(),
+            assignments_finished: []
         }
 
-        // this.updateTableReference = this.updateTableReference.bind(this);
-
+        this.getTableReferencesAsTrs = this.getTableReferencesAsTrs.bind(this);
     }
 
     componentDidMount() {
         Promise.all([
             getList('assignees'),
-            getList('assignments')
-        ]).then(([assignees, assignments]) => {
+            getList('assignments'),
+            getList('assignments_finished')
+        ]).then(([assignees, assignments, assignments_finished]) => {
             this.updateTableReference({
                 assignees,
                 assignments
             });
+            this.updateAssignmentsFinished({
+                assignees,
+                assignments_finished
+            });
         })
     }
 
-    updateTableReference({ assignees, assignments }) {
+    updateTableReference({ assignees, assignments, date_limit }) {
         const { tableReference } = this.state;
         console.log('Assignees', assignees);
         console.log('Assignments', assignments);
     
+        if (date_limit) {
+            assignments = assignments.filter(a => new Date(a.fields.assigned_at) > date_limit);
+        }
+
         for (const assignee of assignees) {
             const assignedAssignments = tableReference.get(assignee);
             if (assignedAssignments) {
@@ -63,33 +72,99 @@ class AssignmentAssignee extends Component {
         }
 
         console.log(tableReference);
-        this.setState({tableReference});
+        this.setState({tableReference, assignments, assignees});
     }
 
-    getTableReferencesAsTrs(tableReference) {
+    updateAssignmentsFinished({ assignments_finished }) {
+        console.log('AssigneesFinished', assignments_finished);
+        this.setState({assignments_finished});
+    }
+
+    showAssignmentStatus() {
+
+    }
+
+    getTableReferencesAsTrs(tableReference, assignments) {
         const result = [];
+        const { assignments_finished } = this.state;
         for (const [key,value] of tableReference.entries()) {
             console.log('Key', key);
             console.log('Value', value);
             result.push(<tr>
-                <td>Assignee {key.pk}</td>
-                <td>{[...value].map(a => a.pk).join('; ')}</td>
+                <td scope="row">{key.fields.name} {key.fields.last_name}</td>
+                <td>{key.fields.position}</td>
+                <td></td>
+                {assignments.map(a => {
+                    if (value.has(a)) {
+                        if (assignments_finished.find(af => af.fields.assignment === a.pk)) {
+                            return <td>V</td>
+                        }
+
+                        return <td><div>Виконується</div></td>
+                    }
+                    return <td> </td>
+                })}
             </tr>)
         }
         return result;
     }
 
+    getAssignmentsAsArrayOfTh(assignments) {
+        const result = [];
+        for (const assignment of assignments) {
+            console.log('assignment', assignment);
+            result.push(<th scope="col">Доручення {assignment.pk}</th>)
+        }
+        return result;
+    }
+
+    onSelectedTimeChange({target}) {
+        console.log(target.value);
+
+        if (target.value === 'all') {
+            this.setState({tableReference: new Map()});
+            Promise.all([
+                getList('assignees'),
+                getList('assignments'),
+                getList('assignments_finished')
+            ]).then(([assignees, assignments, assignments_finished]) => {
+                this.updateTableReference({
+                    assignees,
+                    assignments
+                });
+                this.updateAssignmentsFinished({
+                    assignees,
+                    assignments_finished
+                });
+            })
+            return;
+        }
+        
+        const { assignees, assignments } = this.state;
+        this.updateTableReference({
+            assignees,
+            assignments,
+            date_limit: target.value
+        });
+    }
+
     render() {
         return (
             <div>
-                TableReference:<br/>
-                <table className="table">
+                Статус виконання доручения за 
+                <select onChange={this.onSelectedTimeChange.bind(this)}>
+                    <option value="all" selected="selected">весь час</option>
+                    <option value={new Date(Date.now() - 1000 * 60 * 60 * 24 * 31)}>місяць</option>
+                    <option value={new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)}>тиждень</option>
+                </select>
+                <table className="table table-bordered">
                     <tr>
-                        <th>Виконавець</th>
-                        <th>Посада</th>
-                        <th>\</th>
+                        <th scope="col">Виконавець</th>
+                        <th scope="col">Посада</th>
+                        <th scope="col">\</th>
+                        {this.getAssignmentsAsArrayOfTh(this.state.assignments)}
                     </tr>
-                    {this.getTableReferencesAsTrs(this.state.tableReference)}
+                    {this.getTableReferencesAsTrs(this.state.tableReference, this.state.assignments)}
                 </table>
             </div>
         )
