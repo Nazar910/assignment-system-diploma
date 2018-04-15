@@ -1,11 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-const title = 'Hi from react page';
+import App from './App';
 
 ReactDOM.render(
-    <div>{title}</div>,
+    <App/>,
     document.getElementById('home-page')
 )
-
-module.hot.accept();
