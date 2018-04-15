@@ -3,6 +3,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
 from django import forms
+from django.core import serializers
 
 from assignment_system.models import Assignee
 
@@ -44,6 +45,10 @@ def assignee_list(request):
         return HttpResponseNotFound('Not found!')
 
     assignees = Assignee.objects.all()
+
+    if request.META['HTTP_ACCEPT'] == 'application/json':
+        return HttpResponse(serializers.serialize('json', assignees))
+
     context = {
         'assignees': assignees
     }

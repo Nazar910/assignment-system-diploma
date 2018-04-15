@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from datetime import datetime
+from django.core import serializers
 
 from assignment_system.models import Assignment, TaskOwner, Assignee
 
@@ -126,6 +127,10 @@ def filter_by_description(user, description):
 def assignment_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
+
+    if request.META['HTTP_ACCEPT'] == 'application/json':
+        return HttpResponse(serializers.serialize('json', Assignment.objects.all()))
+
     user = request.user
 
     context = None

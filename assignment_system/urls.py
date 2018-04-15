@@ -81,6 +81,7 @@ directive_urlpatterns = [
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
+        path('assignees/<int:id>', views.update_user_role, name='update_user_role'),
         # Auth routes
         path('signup', views.signUp, name='signup'),
         # suggest logout for logged in users

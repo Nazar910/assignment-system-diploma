@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 
@@ -18,6 +18,13 @@ def home(request):
             'patronymic': task_owner.patronymic,
             'username': user.username
         })
+
+
+def update_user_role(request, id):
+    # TODO add auth
+    print('Id', id)
+    print('POST', request.body)
+    return HttpResponse('Hi')
 
 
 def index(request):
