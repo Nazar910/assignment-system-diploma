@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import cookies from 'js-cookie';
-import AssigneeAssignmentTable from './components/tables/assignment-assignee';
+import AssigneeAssignmentTable from './components/tables/assignments-assignees';
+import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
 
 const title = 'Hi from react App component page';
 
@@ -33,7 +34,14 @@ class App extends Component {
     render() {
         return (
             <div>
-                <AssigneeAssignmentTable />
+                <Tabs>
+                    <TabList>
+                        <Tab>Відстежити виконання всіх доручень за період</Tab>
+                        <Tab>Відстежити виконання одного доручення</Tab>
+                    </TabList>
+                    <TabPanel><AssigneeAssignmentTable /></TabPanel>
+                    <TabPanel>asdsa</TabPanel>
+                </Tabs>
             </div>
         )
     }

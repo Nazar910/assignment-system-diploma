@@ -35,6 +35,7 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField()
     finished_at = models.DateTimeField()
+    deadline = models.DateTimeField(blank=True, null=True)
 
     attachment = models.FileField(blank=True, null=True)
 

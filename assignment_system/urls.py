@@ -35,7 +35,12 @@ assignment_urlpatterns = [
                 'assignments/delete/<int:id>',
                 views.delete_assignment,
                 name='assignment_delete'
-        )
+        ),
+        # path(
+        #         'assignments/assignee/<int:assignee_id>',
+        #         views.get_assignments_by_assignee_id,
+        #         name='get_assignments_by_assignee_id'
+        # )
 ]
 
 post_urlpatterns = [

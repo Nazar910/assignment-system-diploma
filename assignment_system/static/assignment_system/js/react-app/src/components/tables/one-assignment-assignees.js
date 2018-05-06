@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import cookies from 'js-cookie';
 
-const title = 'Hi from react App component page';
-
 async function getList(resourceType) {
     const resp = await axios({
         url: `/assignment_system/${resourceType}`,
@@ -21,7 +19,6 @@ class AssignmentAssignee extends Component {
         super(props);
 
         this.state = {
-            assignments: [],
             assignees: [],
             tableReference: new Map(),
             assignments_finished: []
@@ -96,11 +93,13 @@ class AssignmentAssignee extends Component {
                 <td></td>
                 {assignments.map(a => {
                     if (value.has(a)) {
-                        if (assignments_finished.find(af => af.fields.assignment === a.pk)) {
-                            return <td>V</td>
+                        const { deadline = 'Без дедлайну' } = a;
+                        const finished_assignment = assignments_finished.find(af => af.fields.assignment === a.pk);
+                        if (finished_assignment) {
+                            return <td><div onClick={() => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.finished_at)}>V</div></td>
                         }
 
-                        return <td><div>Виконується</div></td>
+                        return <td><div onClick={() => alert('Дедлайн:' + deadline)}>Виконується</div></td>
                     }
                     return <td> </td>
                 })}
@@ -151,7 +150,7 @@ class AssignmentAssignee extends Component {
     render() {
         return (
             <div>
-                Статус виконання доручения за 
+                Статус виконання доручень за 
                 <select onChange={this.onSelectedTimeChange.bind(this)}>
                     <option value="all" selected="selected">весь час</option>
                     <option value={new Date(Date.now() - 1000 * 60 * 60 * 24 * 31)}>місяць</option>

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.decorators import login_required
@@ -123,6 +123,17 @@ def filter_by_description(user, description):
     }
 
 
+def filter_by_assignee(assignee_id):
+    return Assignee.objects.filter(assignee_id=assignee_id)
+
+
+@login_required(login_url='/assignment_system/login')
+def get_assignments_by_assignee_id(request, assignee_id):
+    assignments = filter_by_assignee(assignee_id)
+
+    return HttpResponse(serializers.serialize('json', assignments))
+
+
 @login_required(login_url='/assignment_system/login')
 def assignment_list(request):
     if request.method != 'GET':
@@ -153,11 +164,15 @@ def assignment_list(request):
 
 @login_required(login_url='/assignment_system/login')
 def create_assignment(request):
+    user = request.user
+    assignee = Assignee.objects.get(email=user.email)
+    if assignee.role == Assignee.JUST_ASSIGNEE:
+        return HttpResponseForbidden('У вас немає доступу до створення доручень!')
+
     form = AssignmentForm(request.POST or None)
     print(form)
     if form.is_valid():
         assignment = form.save()
-        user = request.user
         task_owner = TaskOwner.objects.get(email=user.email)
         assignment.task_owner = task_owner
         assignment.save()
@@ -173,6 +188,9 @@ def create_assignment(request):
 
 @login_required(login_url='/assignment_system/login')
 def update_assignment(request, id):
+    user = request.user
+    assignee = Assignee.objects.get(email=user.email)
+
     assignment = get_object_or_404(Assignment, id=id)
     form = AssignmentForm(request.POST or None, instance=assignment)
     if form.is_valid():
@@ -182,7 +200,10 @@ def update_assignment(request, id):
     return render(
         request,
         'assignment_system/assignment/assignment_form.html',
-        {'form': form}
+        {
+            'form': form,
+            'just_assignee': assignee.role == Assignee.JUST_ASSIGNEE
+        }
     )
     # return HttpResponse('update')
 

@@ -1,9 +1,14 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
+{% if just_assignee %}
+mark as finished
+attach files
+{% else %}
 <form method="post">
     {% csrf_token %}
     {{ form.media }}
     {{ form.as_p }}
     <input type="submit" value="Підтвердити"/>
 </form>
+{% endif %}
 {% endblock %}
