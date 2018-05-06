@@ -5,9 +5,4 @@ from .assignments import assignment_list, create_assignment, \
                         update_assignment, delete_assignment, \
                         show_assignment_template, \
                         get_assignments_by_assignee_id
-from .posts import post_list, create_post, update_post, \
-                    delete_post, show_post_template
-from .directives import directive_list, create_directive, \
-                        update_directive, delete_directive, \
-                        show_directive_template
-from .assignments_finished import assignments_finished_list
+from .assignment_events import assignments_finished_list

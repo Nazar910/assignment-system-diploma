@@ -3,6 +3,8 @@ import axios from 'axios';
 import cookies from 'js-cookie';
 import dateformat from 'dateformat';
 
+const PAGE_SIZE = 3;
+
 async function getList(resourceType) {
     const resp = await axios({
         url: `/assignment_system/${resourceType}`,
@@ -23,10 +25,12 @@ class AssignmentAssignee extends Component {
             assignments: [],
             assignees: [],
             tableReference: new Map(),
-            assignments_finished: []
+            assignments_finished: [],
+            page: 0
         }
 
         this.getTableReferencesAsTrs = this.getTableReferencesAsTrs.bind(this);
+        this.getCurrentAssignmentsBatch = this.getCurrentAssignmentsBatch.bind(this);
     }
 
     componentDidMount() {
@@ -83,9 +87,14 @@ class AssignmentAssignee extends Component {
 
     }
 
-    getTableReferencesAsTrs(tableReference, assignments) {
+    getCurrentAssignmentsBatch() {
+        const { assignments, page } = this.state;
+        return assignments.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+    }
+
+    getTableReferencesAsTrs() {
         const result = [];
-        const { assignments_finished } = this.state;
+        const { assignments_finished, page, tableReference } = this.state;
         for (const [key,value] of tableReference.entries()) {
             console.log('Key', key);
             console.log('Value', value);
@@ -93,7 +102,8 @@ class AssignmentAssignee extends Component {
                 <td scope="row">{key.fields.name} {key.fields.last_name}</td>
                 <td>{key.fields.position}</td>
                 <td></td>
-                {assignments.map(a => {
+                <td></td>
+                {this.getCurrentAssignmentsBatch().map(a => {
                     if (value.has(a)) {
                         const { deadline = 'Без дедлайну' } = a;
                         const finished_assignment = assignments_finished.find(af => af.fields.assignment === a.pk);
@@ -110,14 +120,39 @@ class AssignmentAssignee extends Component {
         return result;
     }
 
-    getAssignmentsAsArrayOfTh(assignments) {
+    getAssignmentsAsArrayOfTh() {
         const result = [];
+        const assignments = this.getCurrentAssignmentsBatch();
         for (const assignment of assignments) {
             console.log('assignment', assignment);
             const date = new Date(assignment.fields.created_at);
-            result.push(<th scope="col">№ {assignment.pk} від {dateformat(date, 'dd.mm.yyyy' )}</th>)
+            result.push(<th scope="col">"{assignment.fields.title}" № {assignment.pk} від {dateformat(date, 'dd.mm.yyyy' )}</th>)
         }
         return result;
+    }
+
+    updatePage(page) {
+        if (page < 0) {
+            return;
+        }
+
+        if (page > this.state.assignments.length / PAGE_SIZE) {
+            return;
+        }
+
+        this.setState({
+            page
+        });
+    }
+
+    pageIncrease() {
+        const { page } = this.state;
+        this.updatePage(page+1);
+    }
+
+    pageDecrease() {
+        const { page } = this.state;
+        this.updatePage(page-1);
     }
 
     onSelectedTimeChange({target}) {
@@ -164,9 +199,11 @@ class AssignmentAssignee extends Component {
                         <th scope="col">Виконавець</th>
                         <th scope="col">Посада</th>
                         <th scope="col">\</th>
-                        {this.getAssignmentsAsArrayOfTh(this.state.assignments)}
+                        <th scope="col"><div className="btn btn-success" onClick={this.pageDecrease.bind(this)}>&#8592;</div></th>
+                        {this.getAssignmentsAsArrayOfTh.call(this)}
+                        <th scope="col"><div className="btn btn-success" onClick={this.pageIncrease.bind(this)}>&#8594;</div></th>
                     </tr>
-                    {this.getTableReferencesAsTrs(this.state.tableReference, this.state.assignments)}
+                    {this.getTableReferencesAsTrs.call(this)}
                 </table>
             </div>
         )

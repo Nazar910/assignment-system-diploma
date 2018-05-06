@@ -43,46 +43,6 @@ assignment_urlpatterns = [
         # )
 ]
 
-post_urlpatterns = [
-        path('posts', views.post_list, name='post_list'),
-        path('posts/new', views.create_post, name='post_new'),
-        path(
-                'posts/edit/<int:id>',
-                views.update_post,
-                name='post_edit'
-        ),
-        path(
-                'posts/template/<int:id>',
-                views.show_post_template,
-                name='post_template'
-        ),
-        path(
-                'posts/delete/<int:id>',
-                views.delete_post,
-                name='post_delete'
-        )
-]
-
-directive_urlpatterns = [
-        path('directives', views.directive_list, name='directive_list'),
-        path('directives/new', views.create_directive, name='directive_new'),
-        path(
-                'directives/edit/<int:id>',
-                views.update_directive,
-                name='directive_edit'
-        ),
-        path(
-                'directives/template/<int:id>',
-                views.show_directive_template,
-                name='directive_template'
-        ),
-        path(
-                'directives/delete/<int:id>',
-                views.delete_directive,
-                name='directive_delete'
-        )
-]
-
 assignments_finished_urlpatterns = [
         path('assignments_finished', views.assignments_finished_list, name='assignments_finished_list')
 ]
@@ -108,6 +68,4 @@ urlpatterns = [
         )
 ] + assignee_urlpatterns \
  + assignment_urlpatterns \
- + post_urlpatterns \
- + directive_urlpatterns \
  + assignments_finished_urlpatterns

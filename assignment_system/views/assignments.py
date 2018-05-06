@@ -7,7 +7,7 @@ from django.db.models import Q
 from datetime import datetime
 from django.core import serializers
 
-from assignment_system.models import Assignment, TaskOwner, Assignee
+from assignment_system.models import Assignment, Assignee
 
 
 class AssignmentForm(ModelForm):
@@ -65,64 +65,6 @@ class AssignmentForm(ModelForm):
         ]
 
 
-def get_all(user):
-    task_owner = TaskOwner.objects.get(email=user.email)
-    assignee = Assignee.objects.get(email=user.email)
-    assignments_assigned_to_me = None
-    if assignee:
-        assignments_assigned_to_me = assignee.assignment_set \
-            .all() \
-            .exclude(task_owner=task_owner)
-
-    assignments_created_by_me = Assignment.objects \
-        .filter(task_owner=task_owner)
-
-    return {
-        'assignments_created_by_me': assignments_created_by_me,
-        'assignments_assigned_to_me': assignments_assigned_to_me
-    }
-
-
-def filter_by_title(user, title):
-    task_owner = TaskOwner.objects.get(email=user.email)
-    assignee = Assignee.objects.get(email=user.email)
-    assignments_assigned_to_me = None
-    if assignee:
-        assignments_assigned_to_me = assignee.assignment_set \
-            .all() \
-            .exclude(task_owner=task_owner) \
-            .filter(title__istartswith=title.lower())
-
-    assignments_created_by_me = Assignment.objects \
-        .filter(task_owner=task_owner) \
-        .filter(title__istartswith=title.lower())
-
-    return {
-        'assignments_created_by_me': assignments_created_by_me,
-        'assignments_assigned_to_me': assignments_assigned_to_me
-    }
-
-
-def filter_by_description(user, description):
-    task_owner = TaskOwner.objects.get(email=user.email)
-    assignee = Assignee.objects.get(email=user.email)
-    assignments_assigned_to_me = None
-    if assignee:
-        assignments_assigned_to_me = assignee.assignment_set \
-            .all() \
-            .exclude(task_owner=task_owner) \
-            .filter(description__istartswith=description.lower())
-
-    assignments_created_by_me = Assignment.objects \
-        .filter(task_owner=task_owner) \
-        .filter(description__istartswith=description.lower())
-
-    return {
-        'assignments_created_by_me': assignments_created_by_me,
-        'assignments_assigned_to_me': assignments_assigned_to_me
-    }
-
-
 def filter_by_assignee(assignee_id):
     return Assignee.objects.filter(assignee_id=assignee_id)
 
@@ -142,24 +84,24 @@ def assignment_list(request):
     if request.META['HTTP_ACCEPT'] == 'application/json':
         return HttpResponse(serializers.serialize('json', Assignment.objects.all()))
 
-    user = request.user
+    # user = request.user
 
-    context = None
-    title = request.GET.get('title')
-    description = request.GET.get('description')
-    date = request.GET.get('date')
-    if title:
-        context = filter_by_title(user, title)
-    elif description:
-        context = filter_by_description(user, description)
-    else:
-        context = get_all(user)
+    # context = None
+    # title = request.GET.get('title')
+    # description = request.GET.get('description')
+    # date = request.GET.get('date')
+    # if title:
+    #     context = filter_by_title(user, title)
+    # elif description:
+    #     context = filter_by_description(user, description)
+    # else:
+    #     context = get_all(user)
 
-    return render(
-        request,
-        'assignment_system/assignment/assignment_list.html',
-        context
-    )
+    # return render(
+    #     request,
+    #     'assignment_system/assignment/assignment_list.html',
+    #     context
+    # )
 
 
 @login_required(login_url='/assignment_system/login')

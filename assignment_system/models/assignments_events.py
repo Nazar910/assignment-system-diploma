@@ -3,7 +3,20 @@ from .assignee import Assignee
 from .assignment import Assignment
 
 
-class AssignmentFinished(models.Model):
+class AssignmentEvent(models.Model):
+    FINISHED = 'fn'
+    STARTED = 'st'
+
+    __event_types = (
+        (FINISHED, 'ЗАКІНЧЕНО'),
+        (STARTED, 'РОЗПОЧАТО'),
+    )
+
+    event_type = models.CharField(
+        max_length=6,
+        choices=__event_types,
+        default=STARTED
+    )
     assignee = models.ForeignKey(
         Assignee,
         verbose_name='Виконувач',
@@ -14,7 +27,7 @@ class AssignmentFinished(models.Model):
         verbose_name='Доручення',
         on_delete=models.CASCADE
     )
-    finished_at = models.DateTimeField()
+    date = models.DateTimeField()
 
     def __str__(self):
         return self.assignment.__str__()
