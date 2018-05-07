@@ -1,21 +1,8 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import cookies from 'js-cookie';
 import dateformat from 'dateformat';
+import { getList } from '../../api';
 
 const PAGE_SIZE = 3;
-
-async function getList(resourceType) {
-    const resp = await axios({
-        url: `/assignment_system/${resourceType}`,
-        headers: {
-            'X-CSRFToken': cookies.get('csrftoken'),
-            'Accept': 'application/json'
-        },
-        method: 'GET'
-    });
-    return resp.data
-}
 
 class AssignmentAssignee extends Component {
     constructor(props) {
