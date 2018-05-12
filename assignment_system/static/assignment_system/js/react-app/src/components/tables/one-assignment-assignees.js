@@ -53,7 +53,8 @@ class OneAssignmentAssignees extends Component {
                 assigneeMap,
                 isLoading: false
             })
-        });
+        })
+        .catch(e => console.error('Something bad happened', e));
     }
 
     getAssigneesTrs() {

@@ -40,10 +40,24 @@ export function getAssignmentAssignees(id) {
     return get(`assignees/assignment/${id}`);
 }
 
-export function getEventsStartedforAssignment(id) {
-    return get(`assignments_started/assignment/${id}`);
+export async function getEventsStartedforAssignment(id) {
+    try {
+        return await get(`assignments_started/assignment/${id}`);
+    } catch (e) {
+        if (e.response.status === 404) {
+            return [];
+        }
+        throw e;
+    }
 }
 
-export function getEventsFinishedforAssignment(id) {
-    return get(`assignments_finished/assignment/${id}`);
+export async function getEventsFinishedforAssignment(id) {
+    try {
+        return await get(`assignments_finished/assignment/${id}`);
+    } catch (e) {
+        if (e.response.status === 404) {
+            return [];
+        }
+        throw e;
+    }
 }

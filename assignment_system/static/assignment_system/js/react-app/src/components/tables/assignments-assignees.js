@@ -134,7 +134,8 @@ class AssignmentAssignee extends Component {
         const assignments = this.getCurrentAssignmentsBatch();
         for (const assignment of assignments) {
             const date = new Date(assignment.fields.created_at);
-            result.push(<th id={"assignment-" + assignment.pk} scope="col">"{assignment.fields.title}" № {assignment.pk} від {dateformat(date, 'dd.mm.yyyy' )}</th>)
+            const onClick = () => this.props.openAssignment(assignment.pk);
+            result.push(<th id={"assignment-" + assignment.pk} scope="col" onClick={onClick}>"{assignment.fields.title}" № {assignment.pk} від {dateformat(date, 'dd.mm.yyyy' )}</th>)
         }
         return result;
     }
