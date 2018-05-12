@@ -85,25 +85,42 @@ class AssignmentAssignee extends Component {
     getTableReferencesAsTrs() {
         const result = [];
         const { assignments_finished, page, tableReference } = this.state;
+        const onMouseFuncs = (assigneeId, assignmentId) => {
+            return {
+                onEnter() {
+                    const assignee = document.getElementById(`assignee-${assigneeId}`);
+                    const assignment = document.getElementById(`assignment-${assignmentId}`);
+                    assignee.style['background-color'] = 'lightblue';
+                    assignment.style['background-color'] = 'lightblue';
+                },
+                onLeave() {
+                    const assignee = document.getElementById(`assignee-${assigneeId}`);
+                    const assignment = document.getElementById(`assignment-${assignmentId}`);
+                    assignee.style['background-color'] = 'transparent';
+                    assignment.style['background-color'] = 'transparent';
+                }
+            }
+        };
         for (const [key,value] of tableReference.entries()) {
             console.log('Key', key);
             console.log('Value', value);
             result.push(<tr>
-                <td scope="row">{key.fields.name} {key.fields.last_name}</td>
+                <td id={"assignee-" + key.pk} scope="row">{key.fields.name} {key.fields.last_name}</td>
                 <td>{key.fields.position}</td>
                 <td></td>
-                <td></td>
                 {this.getCurrentAssignmentsBatch().map(a => {
+                    const { onEnter, onLeave } = onMouseFuncs(key.pk, a.pk);
                     if (value.has(a)) {
                         const { deadline = 'Без дедлайну' } = a;
                         const finished_assignment = assignments_finished.find(af => af.fields.assignee === key.pk && af.fields.event_type === 'fn');
                         if (finished_assignment) {
-                            return <td><div onClick={() => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.finished_at)}>V</div></td>
+                            const onClick = () => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.finished_at);
+                            return <td><div onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>V</div></td>
                         }
 
-                        return <td><div onClick={() => alert('Дедлайн:' + deadline)}>Виконується</div></td>
+                        return <td><div onClick={() => alert('Дедлайн:' + deadline)} onMouseEnter={onEnter} onMouseLeave={onLeave}>Виконується</div></td>
                     }
-                    return <td> </td>
+                    return <td onMouseEnter={onEnter} onMouseLeave={onLeave}> </td>
                 })}
             </tr>)
         }
@@ -114,9 +131,8 @@ class AssignmentAssignee extends Component {
         const result = [];
         const assignments = this.getCurrentAssignmentsBatch();
         for (const assignment of assignments) {
-            console.log('assignment', assignment);
             const date = new Date(assignment.fields.created_at);
-            result.push(<th scope="col">"{assignment.fields.title}" № {assignment.pk} від {dateformat(date, 'dd.mm.yyyy' )}</th>)
+            result.push(<th id={"assignment-" + assignment.pk} scope="col">"{assignment.fields.title}" № {assignment.pk} від {dateformat(date, 'dd.mm.yyyy' )}</th>)
         }
         return result;
     }
@@ -188,9 +204,12 @@ class AssignmentAssignee extends Component {
                 </select>
                 <table className="table table-bordered">
                     <tr>
-                        <th scope="col">Виконавець</th>
+                        <th colSpan="2" scope="col">Виконавці</th>
+                        <th colSpan={PAGE_SIZE+2} scope="col">Доручення</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">ПІБ</th>
                         <th scope="col">Посада</th>
-                        <th scope="col"><div class="arrow-up"></div></th>
                         <th scope="col"><div className="btn btn-success" onClick={this.pageDecrease.bind(this)}>&#8592;</div></th>
                         {this.getAssignmentsAsArrayOfTh.call(this)}
                         <th scope="col"><div className="btn btn-success" onClick={this.pageIncrease.bind(this)}>&#8594;</div></th>

@@ -75,7 +75,6 @@ class OneAssignmentAssignees extends Component {
             result.push(<tr>
                 <td scope="row">{assignee.fields.name} {assignee.fields.last_name}</td>
                 <td>{assignee.fields.position}</td>
-                <td></td>
                 {status}
             </tr>)
         }
@@ -93,9 +92,12 @@ class OneAssignmentAssignees extends Component {
                         Статус виконання доручення № {assignment.pk}
                         <table className="table table-bordered">
                             <tr>
-                                <th scope="col">Виконавець</th>
+                                <th colSpan="2" scope="col">Виконавці</th>
+                                <th scope="col">Доручення</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">ПІБ</th>
                                 <th scope="col">Посада</th>
-                                <th scope="col"><div class="arrow-up"></div></th>
                                 <th scope="col">
                                     "{assignment.fields.title}"
                                     № {assignment.pk} від 
