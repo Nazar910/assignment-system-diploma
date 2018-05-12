@@ -13,7 +13,8 @@ class AssignmentAssignee extends Component {
             assignees: [],
             tableReference: new Map(),
             assignments_finished: [],
-            page: 0
+            page: 0,
+            isLoading: true
         }
 
         this.getTableReferencesAsTrs = this.getTableReferencesAsTrs.bind(this);
@@ -21,6 +22,7 @@ class AssignmentAssignee extends Component {
     }
 
     componentDidMount() {
+        console.log('Parent');
         Promise.all([
             getList('assignees'),
             getList('assignments'),
@@ -34,16 +36,17 @@ class AssignmentAssignee extends Component {
                 assignees,
                 assignments_finished
             });
+            this.setState({
+                isLoading: false
+            })
         })
     }
 
     updateTableReference({ assignees, assignments, date_limit }) {
         const { tableReference } = this.state;
-        console.log('Assignees', assignees);
-        console.log('Assignments', assignments);
     
         if (date_limit) {
-            assignments = assignments.filter(a => new Date(a.fields.assigned_at) > date_limit);
+            assignments = assignments.filter(a => new Date(a.fields.created_at) > date_limit);
         }
 
         for (const assignee of assignees) {
@@ -93,7 +96,7 @@ class AssignmentAssignee extends Component {
                 {this.getCurrentAssignmentsBatch().map(a => {
                     if (value.has(a)) {
                         const { deadline = 'Без дедлайну' } = a;
-                        const finished_assignment = assignments_finished.find(af => af.fields.assignment === a.pk);
+                        const finished_assignment = assignments_finished.find(af => af.fields.assignee === key.pk && af.fields.event_type === 'fn');
                         if (finished_assignment) {
                             return <td><div onClick={() => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.finished_at)}>V</div></td>
                         }
@@ -143,8 +146,6 @@ class AssignmentAssignee extends Component {
     }
 
     onSelectedTimeChange({target}) {
-        console.log(target.value);
-
         if (target.value === 'all') {
             this.setState({tableReference: new Map()});
             Promise.all([
@@ -164,6 +165,7 @@ class AssignmentAssignee extends Component {
             return;
         }
         
+        console.log('Date_limit', target.value);
         const { assignees, assignments } = this.state;
         this.updateTableReference({
             assignees,
@@ -173,7 +175,10 @@ class AssignmentAssignee extends Component {
     }
 
     render() {
-        return (
+        const { isLoading } = this.state;
+        return (<div>
+            {isLoading ?
+            <div id="loading"></div> :
             <div>
                 Статус виконання доручень за 
                 <select onChange={this.onSelectedTimeChange.bind(this)}>
@@ -185,14 +190,15 @@ class AssignmentAssignee extends Component {
                     <tr>
                         <th scope="col">Виконавець</th>
                         <th scope="col">Посада</th>
-                        <th scope="col">\</th>
+                        <th scope="col"><div class="arrow-up"></div></th>
                         <th scope="col"><div className="btn btn-success" onClick={this.pageDecrease.bind(this)}>&#8592;</div></th>
                         {this.getAssignmentsAsArrayOfTh.call(this)}
                         <th scope="col"><div className="btn btn-success" onClick={this.pageIncrease.bind(this)}>&#8594;</div></th>
                     </tr>
                     {this.getTableReferencesAsTrs.call(this)}
                 </table>
-            </div>
+            </div>}
+        </div>
         )
     }
 }

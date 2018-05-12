@@ -1,173 +1,114 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import cookies from 'js-cookie';
+import dateformat from 'dateformat';
+import { 
+    getAssignment,
+    getAssignmentAssignees,
+    getEventsStartedforAssignment,
+    getEventsFinishedforAssignment
+} from '../../api';
 
-async function getList(resourceType) {
-    const resp = await axios({
-        url: `/assignment_system/${resourceType}`,
-        headers: {
-            'X-CSRFToken': cookies.get('csrftoken'),
-            'Accept': 'application/json'
-        },
-        method: 'GET'
-    });
-    return resp.data
-}
-
-class AssignmentAssignee extends Component {
+class OneAssignmentAssignees extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            assignment: {},
             assignees: [],
-            tableReference: new Map(),
-            assignments_finished: []
-        }
-
-        this.getTableReferencesAsTrs = this.getTableReferencesAsTrs.bind(this);
+            assigneeMap: new Map(),
+            isLoading: true,
+        };
     }
 
     componentDidMount() {
+        let { assignment_id } = this.props;
+
+        if (!assignment_id) {
+            assignment_id = prompt('Введіть номер потрібного доручення!', '6');
+        }
         Promise.all([
-            getList('assignees'),
-            getList('assignments'),
-            getList('assignments_finished')
-        ]).then(([assignees, assignments, assignments_finished]) => {
-            this.updateTableReference({
+            getAssignment(assignment_id),
+            getAssignmentAssignees(assignment_id),
+            getEventsStartedforAssignment(assignment_id),
+            getEventsFinishedforAssignment(assignment_id)
+        ])
+        .then(([
+            assignment,
+            assignees,
+            assignments_started,
+            assignments_finished
+        ]) => {
+            const assignmentsFinishedMap = new Map();
+            
+            const assigneeMap = new Map();
+
+            assignees.forEach(a => {
+                const finished = assignments_finished.filter(af => af.fields.assignee === a.pk);
+                const started = assignments_started.filter(as => as.fields.assignee === a.pk);
+                assigneeMap.set(a, [...finished, ...started])
+            })
+
+            this.setState({
+                assignment,
                 assignees,
-                assignments
-            });
-            this.updateAssignmentsFinished({
-                assignees,
-                assignments_finished
-            });
-        })
+                assigneeMap,
+                isLoading: false
+            })
+        });
     }
 
-    updateTableReference({ assignees, assignments, date_limit }) {
-        const { tableReference } = this.state;
-        console.log('Assignees', assignees);
-        console.log('Assignments', assignments);
-    
-        if (date_limit) {
-            assignments = assignments.filter(a => new Date(a.fields.assigned_at) > date_limit);
-        }
-
-        for (const assignee of assignees) {
-            const assignedAssignments = tableReference.get(assignee);
-            if (assignedAssignments) {
-                assignedAssignments.add(
-                    assignments.filter(({fields}) => fields.assignees.find(a => a === assignee.pk)
-                ));
-                tableReference.set(assignee, assignedAssignments);
-                continue;
-            }
-            tableReference.set(
-                assignee,
-                new Set(assignments.filter(({fields}) => fields.assignees.find(a => a === assignee.pk)))
-            );
-        }
-
-        console.log(tableReference);
-        this.setState({tableReference, assignments, assignees});
-    }
-
-    updateAssignmentsFinished({ assignments_finished }) {
-        console.log('AssigneesFinished', assignments_finished);
-        this.setState({assignments_finished});
-    }
-
-    showAssignmentStatus() {
-
-    }
-
-    getTableReferencesAsTrs(tableReference, assignments) {
+    getAssigneesTrs() {
         const result = [];
-        const { assignments_finished } = this.state;
-        for (const [key,value] of tableReference.entries()) {
-            console.log('Key', key);
-            console.log('Value', value);
-            result.push(<tr>
-                <td scope="row">{key.fields.name} {key.fields.last_name}</td>
-                <td>{key.fields.position}</td>
-                <td></td>
-                {assignments.map(a => {
-                    if (value.has(a)) {
-                        const { deadline = 'Без дедлайну' } = a;
-                        const finished_assignment = assignments_finished.find(af => af.fields.assignment === a.pk);
-                        if (finished_assignment) {
-                            return <td><div onClick={() => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.finished_at)}>V</div></td>
-                        }
+        const { assigneeMap, assignment } = this.state;
+        const { deadline = 'Без дедлайну' } = assignment;
+        for (const [assignee, events] of assigneeMap.entries()) {
+            let status = <td> </td>;
 
-                        return <td><div onClick={() => alert('Дедлайн:' + deadline)}>Виконується</div></td>
-                    }
-                    return <td> </td>
-                })}
+            const stEvent = events.find(e => e.fields.event_type === 'st');
+            const fnEvent = events.find(e => e.fields.event_type === 'fn');
+
+            if (fnEvent) {
+                status = <td><div onClick={() => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + fnEvent.fields.date)}>V</div></td>
+            } else if (stEvent) {
+                status = <td><div onClick={() => alert('Дедлайн:' + deadline)}>Виконується</div></td>
+            }
+
+            result.push(<tr>
+                <td scope="row">{assignee.fields.name} {assignee.fields.last_name}</td>
+                <td>{assignee.fields.position}</td>
+                <td></td>
+                {status}
             </tr>)
         }
         return result;
     }
 
-    getAssignmentsAsArrayOfTh(assignments) {
-        const result = [];
-        for (const assignment of assignments) {
-            console.log('assignment', assignment);
-            result.push(<th scope="col">Доручення {assignment.pk}</th>)
-        }
-        return result;
-    }
-
-    onSelectedTimeChange({target}) {
-        console.log(target.value);
-
-        if (target.value === 'all') {
-            this.setState({tableReference: new Map()});
-            Promise.all([
-                getList('assignees'),
-                getList('assignments'),
-                getList('assignments_finished')
-            ]).then(([assignees, assignments, assignments_finished]) => {
-                this.updateTableReference({
-                    assignees,
-                    assignments
-                });
-                this.updateAssignmentsFinished({
-                    assignees,
-                    assignments_finished
-                });
-            })
-            return;
-        }
-        
-        const { assignees, assignments } = this.state;
-        this.updateTableReference({
-            assignees,
-            assignments,
-            date_limit: target.value
-        });
-    }
-
     render() {
+        const { assignment, isLoading } = this.state;
         return (
             <div>
-                Статус виконання доручень за 
-                <select onChange={this.onSelectedTimeChange.bind(this)}>
-                    <option value="all" selected="selected">весь час</option>
-                    <option value={new Date(Date.now() - 1000 * 60 * 60 * 24 * 31)}>місяць</option>
-                    <option value={new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)}>тиждень</option>
-                </select>
-                <table className="table table-bordered">
-                    <tr>
-                        <th scope="col">Виконавець</th>
-                        <th scope="col">Посада</th>
-                        <th scope="col">\</th>
-                        {this.getAssignmentsAsArrayOfTh(this.state.assignments)}
-                    </tr>
-                    {this.getTableReferencesAsTrs(this.state.tableReference, this.state.assignments)}
-                </table>
+                {
+                    isLoading ? 
+                    <div id="loading"></div> :
+                    <div>
+                        Статус виконання доручення № {assignment.pk}
+                        <table className="table table-bordered">
+                            <tr>
+                                <th scope="col">Виконавець</th>
+                                <th scope="col">Посада</th>
+                                <th scope="col"><div class="arrow-up"></div></th>
+                                <th scope="col">
+                                    "{assignment.fields.title}"
+                                    № {assignment.pk} від 
+                                    {dateformat(new Date(assignment.fields.created_at), 'dd.mm.yyyy' )}
+                                </th>
+                            </tr>
+                            {this.getAssigneesTrs.call(this)}
+                        </table>
+                    </div>
+                }
             </div>
         )
     }
 }
 
-export default AssignmentAssignee;
+export default OneAssignmentAssignees;
