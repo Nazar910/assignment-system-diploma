@@ -72,7 +72,7 @@ class OneAssignmentAssignees extends Component {
                 status = <td><div onClick={() => alert('Дедлайн:' + deadline)}>Виконується</div></td>
             }
 
-            result.push(<tr>
+            result.push(<tr className="one-assignment-table-trs">
                 <td scope="row">{assignee.fields.name} {assignee.fields.last_name}</td>
                 <td>{assignee.fields.position}</td>
                 {status}
