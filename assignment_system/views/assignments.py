@@ -76,6 +76,12 @@ def get_assignments_by_assignee_id(request, assignee_id):
     return HttpResponse(serializers.serialize('json', assignments))
 
 
+@login_required
+def get_assignment_by_id(request, id):
+    assignment = get_object_or_404(Assignment, id=id)
+    return HttpResponse(serializers.serialize('json', [assignment]))
+
+
 @login_required(login_url='/assignment_system/login')
 def assignment_list(request):
     if request.method != 'GET':
@@ -84,24 +90,10 @@ def assignment_list(request):
     if request.META['HTTP_ACCEPT'] == 'application/json':
         return HttpResponse(serializers.serialize('json', Assignment.objects.all()))
 
-    # user = request.user
-
-    # context = None
-    # title = request.GET.get('title')
-    # description = request.GET.get('description')
-    # date = request.GET.get('date')
-    # if title:
-    #     context = filter_by_title(user, title)
-    # elif description:
-    #     context = filter_by_description(user, description)
-    # else:
-    #     context = get_all(user)
-
-    # return render(
-    #     request,
-    #     'assignment_system/assignment/assignment_list.html',
-    #     context
-    # )
+    return render(
+        request,
+        'assignment_system/assignment/assignment_list.html'
+    )
 
 
 @login_required(login_url='/assignment_system/login')

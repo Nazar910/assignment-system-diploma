@@ -15,6 +15,11 @@ assignee_urlpatterns = [
                 'assignees/delete/<int:id>',
                 views.delete_assignee,
                 name='assignee_delete'
+        ),
+        path(
+                'assignees/assignment/<int:assignment_id>',
+                views.get_assignees_by_assignment_id,
+                name='get_assignees_by_assignment_id'
         )
 ]
 
@@ -25,6 +30,11 @@ assignment_urlpatterns = [
                 'assignments/edit/<int:id>',
                 views.update_assignment,
                 name='assignment_edit'
+        ),
+        path(
+                'assignments/<int:id>',
+                views.get_assignment_by_id,
+                name='get_assignment_by_id'
         ),
         path(
                 'assignments/template/<int:id>',
@@ -44,7 +54,20 @@ assignment_urlpatterns = [
 ]
 
 assignments_finished_urlpatterns = [
-        path('assignments_finished', views.assignments_finished_list, name='assignments_finished_list')
+        path('assignments_finished', views.assignments_finished_list, name='assignments_finished_list'),
+        path(
+                'assignments_finished/assignment/<int:id>',
+                views.assignment_finished_by_assignment_id,
+                name='assignment_finished_by_assignment_id'
+        )
+]
+
+assignments_started_urlpatterns = [
+        path(
+                'assignments_started/assignment/<int:id>',
+                views.assignment_started_by_assignment_id,
+                name='assignment_started_by_assignment_id'
+        )
 ]
 
 urlpatterns = [
@@ -68,4 +91,5 @@ urlpatterns = [
         )
 ] + assignee_urlpatterns \
  + assignment_urlpatterns \
- + assignments_finished_urlpatterns
+ + assignments_finished_urlpatterns \
+ + assignments_started_urlpatterns
