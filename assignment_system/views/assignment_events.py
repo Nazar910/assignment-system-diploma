@@ -8,12 +8,23 @@ from django.core import serializers
 from assignment_system.models import AssignmentEvent
 
 
+@login_required
 def assignments_finished_list(request):
     accept_json = request.META['HTTP_ACCEPT'] == 'application/json'
     if request.method != 'GET' or not accept_json:
         return HttpResponseNotFound('Not found!')
 
     assignments_events = get_list_or_404(AssignmentEvent, event_type=AssignmentEvent.FINISHED)
+    return HttpResponse(serializers.serialize('json', assignments_events))
+
+
+@login_required
+def assignments_started_list(request):
+    accept_json = request.META['HTTP_ACCEPT'] == 'application/json'
+    if request.method != 'GET' or not accept_json:
+        return HttpResponseNotFound('Not found!')
+
+    assignments_events = get_list_or_404(AssignmentEvent, event_type=AssignmentEvent.STARTED)
     return HttpResponse(serializers.serialize('json', assignments_events))
 
 

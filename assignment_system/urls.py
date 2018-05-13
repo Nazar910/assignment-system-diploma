@@ -63,6 +63,7 @@ assignments_finished_urlpatterns = [
 ]
 
 assignments_started_urlpatterns = [
+        path('assignments_started', views.assignments_started_list, name='assignments_started_list'),
         path(
                 'assignments_started/assignment/<int:id>',
                 views.assignment_started_by_assignment_id,

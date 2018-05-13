@@ -16,11 +16,16 @@ class OneAssignmentAssignees extends Component {
             assignees: [],
             assigneeMap: new Map(),
             isLoading: true,
+            assignment_id: props.assignment_id
         };
+
+        this.displayErrorMessage = this.displayErrorMessage.bind(this);
+        this.cleanError = this.cleanError.bind(this);
+        this.onAssignmentIdChange = this.onAssignmentIdChange.bind(this);
     }
 
     componentDidMount() {
-        let { assignment_id } = this.props;
+        let { assignment_id } = this.state;
 
         if (!assignment_id) {
             assignment_id = prompt('Введіть номер потрібного доручення!', '6');
@@ -52,9 +57,15 @@ class OneAssignmentAssignees extends Component {
                 assignees,
                 assigneeMap,
                 isLoading: false
-            })
+            });
+            document.getElementById('assignment-id').value = assignment_id;
         })
-        .catch(e => console.error('Something bad happened', e));
+        .catch(e => {
+            console.error('Something bad happened', e);
+            if (e.assignee_404) {
+                this.displayErrorMessage(`Доручення з номером ${assignment_id} не знайдено!`);
+            }
+        });
     }
 
     getAssigneesTrs() {
@@ -82,15 +93,54 @@ class OneAssignmentAssignees extends Component {
         return result;
     }
 
+    displayErrorMessage(msg) {
+        this.setState({
+            errorMessage: msg
+        });
+    }
+
+    cleanError() {
+        this.setState({
+            errorMessage: ''
+        });
+    }
+
+    onAssignmentIdChange({target}) {
+        const { value } = target;
+
+        if (!value) {
+            this.displayErrorMessage('Пусті вхідні дані!');
+            return;
+        }
+
+        if (isNaN(value)) {
+            this.displayErrorMessage('Номер доручення має бути числом!');
+            return;
+        }
+
+        this.cleanError();
+        this.setState({
+            assignment_id: value,
+            isLoading: true
+        }, () => this.componentDidMount());
+    }
+
     render() {
-        const { assignment, isLoading } = this.state;
+        const { assignment, isLoading, errorMessage } = this.state;
         return (
             <div>
+                Статус виконання доручення № <input type="text" id="assignment-id" onChange={this.onAssignmentIdChange}/>
+                {
+                    errorMessage ? 
+                    <div class="alert alert-danger">
+                        { errorMessage }
+                    </div> :
+                    ""
+                }
                 {
                     isLoading ? 
                     <div id="loading"></div> :
                     <div>
-                        Статус виконання доручення № {assignment.pk}
                         <table className="table table-bordered">
                             <tr>
                                 <th colSpan="2" scope="col">Виконавці</th>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import dateformat from 'dateformat';
-import { getList } from '../../api';
+import { getList, getEventsFinished, getEventsStarted } from '../../api';
 
 const PAGE_SIZE = 3;
 
@@ -13,6 +13,7 @@ class AssignmentAssignee extends Component {
             assignees: [],
             tableReference: new Map(),
             assignments_finished: [],
+            assignments_started: [],
             page: 0,
             isLoading: true
         }
@@ -22,22 +23,20 @@ class AssignmentAssignee extends Component {
     }
 
     componentDidMount() {
-        console.log('Parent');
         Promise.all([
             getList('assignees'),
             getList('assignments'),
-            getList('assignments_finished')
-        ]).then(([assignees, assignments, assignments_finished]) => {
+            getEventsFinished(),
+            getEventsStarted()
+        ]).then(([assignees, assignments, assignments_finished, assignments_started]) => {
             this.updateTableReference({
                 assignees,
                 assignments
             });
-            this.updateAssignmentsFinished({
-                assignees,
-                assignments_finished
-            });
             this.setState({
-                isLoading: false
+                isLoading: false,
+                assignments_finished,
+                assignments_started
             })
         })
     }
@@ -68,11 +67,6 @@ class AssignmentAssignee extends Component {
         this.setState({tableReference, assignments, assignees});
     }
 
-    updateAssignmentsFinished({ assignments_finished }) {
-        console.log('AssigneesFinished', assignments_finished);
-        this.setState({assignments_finished});
-    }
-
     showAssignmentStatus() {
 
     }
@@ -84,7 +78,7 @@ class AssignmentAssignee extends Component {
 
     getTableReferencesAsTrs() {
         const result = [];
-        const { assignments_finished, page, tableReference } = this.state;
+        const { assignments_finished, assignments_started, page, tableReference } = this.state;
         const onMouseFuncs = (assigneeId, assignmentId) => {
             return {
                 onEnter() {
@@ -114,13 +108,18 @@ class AssignmentAssignee extends Component {
                     const { onEnter, onLeave } = onMouseFuncs(key.pk, a.pk);
                     if (value.has(a)) {
                         const { deadline = 'Без дедлайну' } = a;
-                        const finished_assignment = assignments_finished.find(af => af.fields.assignee === key.pk && af.fields.event_type === 'fn');
+                        const finished_assignment = assignments_finished.find(af => af.fields.assignee === key.pk);
                         if (finished_assignment) {
-                            const onClick = () => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.finished_at);
+                            const onClick = () => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.date);
                             return <td id={`assignee-${key.pk}-assignment-${a.pk}`}><div onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>V</div></td>
                         }
 
-                        return <td id={`assignee-${key.pk}-assignment-${a.pk}`}><div onClick={() => alert('Дедлайн:' + deadline)} onMouseEnter={onEnter} onMouseLeave={onLeave}>Виконується</div></td>
+                        const started_assignment = assignments_started.find(af => af.fields.assignee === key.pk);
+                        if (started_assignment) {
+                            const onClick = () => alert('Дедлайн: ' + deadline + '\nВиконується з: ' + started_assignment.fields.date);
+                            return <td id={`assignee-${key.pk}-assignment-${a.pk}`}><div onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>Виконується</div></td>
+                        }
+
                     }
                     return <td id={`assignee-${key.pk}-assignment-${a.pk}`} onMouseEnter={onEnter} onMouseLeave={onLeave}> </td>
                 })}
