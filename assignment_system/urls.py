@@ -15,6 +15,11 @@ assignee_urlpatterns = [
                 'assignees/delete/<int:id>',
                 views.delete_assignee,
                 name='assignee_delete'
+        ),
+        path(
+                'assignees/assignment/<int:assignment_id>',
+                views.get_assignees_by_assignment_id,
+                name='get_assignees_by_assignment_id'
         )
 ]
 
@@ -27,6 +32,11 @@ assignment_urlpatterns = [
                 name='assignment_edit'
         ),
         path(
+                'assignments/<int:id>',
+                views.get_assignment_by_id,
+                name='get_assignment_by_id'
+        ),
+        path(
                 'assignments/template/<int:id>',
                 views.show_assignment_template,
                 name='assignment_template'
@@ -35,52 +45,36 @@ assignment_urlpatterns = [
                 'assignments/delete/<int:id>',
                 views.delete_assignment,
                 name='assignment_delete'
+        ),
+        # path(
+        #         'assignments/assignee/<int:assignee_id>',
+        #         views.get_assignments_by_assignee_id,
+        #         name='get_assignments_by_assignee_id'
+        # )
+]
+
+assignments_finished_urlpatterns = [
+        path('assignments_finished', views.assignments_finished_list, name='assignments_finished_list'),
+        path(
+                'assignments_finished/assignment/<int:id>',
+                views.assignment_finished_by_assignment_id,
+                name='assignment_finished_by_assignment_id'
         )
 ]
 
-post_urlpatterns = [
-        path('posts', views.post_list, name='post_list'),
-        path('posts/new', views.create_post, name='post_new'),
+assignments_started_urlpatterns = [
+        path('assignments_started', views.assignments_started_list, name='assignments_started_list'),
         path(
-                'posts/edit/<int:id>',
-                views.update_post,
-                name='post_edit'
-        ),
-        path(
-                'posts/template/<int:id>',
-                views.show_post_template,
-                name='post_template'
-        ),
-        path(
-                'posts/delete/<int:id>',
-                views.delete_post,
-                name='post_delete'
-        )
-]
-
-directive_urlpatterns = [
-        path('directives', views.directive_list, name='directive_list'),
-        path('directives/new', views.create_directive, name='directive_new'),
-        path(
-                'directives/edit/<int:id>',
-                views.update_directive,
-                name='directive_edit'
-        ),
-        path(
-                'directives/template/<int:id>',
-                views.show_directive_template,
-                name='directive_template'
-        ),
-        path(
-                'directives/delete/<int:id>',
-                views.delete_directive,
-                name='directive_delete'
+                'assignments_started/assignment/<int:id>',
+                views.assignment_started_by_assignment_id,
+                name='assignment_started_by_assignment_id'
         )
 ]
 
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
+        path('assignees/<int:id>', views.update_user_role, name='update_user_role'),
         # Auth routes
         path('signup', views.signUp, name='signup'),
         # suggest logout for logged in users
@@ -98,5 +92,5 @@ urlpatterns = [
         )
 ] + assignee_urlpatterns \
  + assignment_urlpatterns \
- + post_urlpatterns \
- + directive_urlpatterns
+ + assignments_finished_urlpatterns \
+ + assignments_started_urlpatterns

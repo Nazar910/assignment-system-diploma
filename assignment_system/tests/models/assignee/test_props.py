@@ -15,6 +15,7 @@ class AssigneeTestCase(TestCase):
         self.assertEqual(assignee.name, "John")
         self.assertEqual(assignee.last_name, "Doe")
         self.assertEqual(assignee.email, "john.doe@gmail.com")
+        self.assertEqual(assignee.role, Assignee.JUST_ASSIGNEE)
 
     def test_when_name_is_longer_than_30_should_fail(self):
         with self.assertRaises(Exception) as cm:

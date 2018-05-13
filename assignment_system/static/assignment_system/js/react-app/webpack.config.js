@@ -1,10 +1,11 @@
 const webpack = require('webpack');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 module.exports = {
-  entry: [
-    'react-hot-loader/patch',
-    './src/index.js'
-  ],
+  entry: {
+    'index': ['babel-polyfill','./src/index.js'],
+    'assignment-list-page': './src/assignment.js'
+  },
   module: {
     rules: [
       {
@@ -20,10 +21,10 @@ module.exports = {
   output: {
     path: __dirname + '/dist',
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: '[name].js'
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin()
+    new ProgressBarPlugin()
   ],
   devServer: {
     contentBase: './dist',

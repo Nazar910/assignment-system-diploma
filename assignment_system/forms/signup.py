@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from assignment_system.models.taskowner import TaskOwner
+from assignment_system.models import Assignee
 
 
 class SignUpForm(UserCreationForm):
@@ -89,7 +89,7 @@ class SignUpForm(UserCreationForm):
         """
         Ensure user to be in task-owners list
         """
-        TaskOwner.objects.create(
+        Assignee.objects.create(
             name=user.first_name,
             last_name=user.last_name,
             patronymic=self.cleaned_data['patronymic'],

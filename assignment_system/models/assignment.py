@@ -1,15 +1,15 @@
 from django.db import models
 from .assignee import Assignee
-from .taskowner import TaskOwner
 
 
 class Assignment(models.Model):
-    task_owner = models.ForeignKey(
-        TaskOwner,
+    author = models.ForeignKey(
+        Assignee,
         on_delete=models.CASCADE,
         # shitty
         blank=True,
-        null=True
+        null=True,
+        related_name='%(class)s_which_created_assignee'
     )
     title = models.CharField('Заголовок', max_length=50)
     description = models.TextField('Опис')
@@ -33,8 +33,7 @@ class Assignment(models.Model):
     "Date stuff"
     assigned_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
-    started_at = models.DateTimeField()
-    finished_at = models.DateTimeField()
+    deadline = models.DateTimeField(blank=True, null=True)
 
     attachment = models.FileField(blank=True, null=True)
 

@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from datetime import datetime
+from django.core import serializers
 
-from assignment_system.models import Assignment, TaskOwner, Assignee
+from assignment_system.models import Assignment, Assignee
 
 
 class AssignmentForm(ModelForm):
@@ -64,95 +65,48 @@ class AssignmentForm(ModelForm):
         ]
 
 
-def get_all(user):
-    task_owner = TaskOwner.objects.get(email=user.email)
-    assignee = Assignee.objects.get(email=user.email)
-    assignments_assigned_to_me = None
-    if assignee:
-        assignments_assigned_to_me = assignee.assignment_set \
-            .all() \
-            .exclude(task_owner=task_owner)
-
-    assignments_created_by_me = Assignment.objects \
-        .filter(task_owner=task_owner)
-
-    return {
-        'assignments_created_by_me': assignments_created_by_me,
-        'assignments_assigned_to_me': assignments_assigned_to_me
-    }
+def filter_by_assignee(assignee_id):
+    return Assignee.objects.filter(assignee_id=assignee_id)
 
 
-def filter_by_title(user, title):
-    task_owner = TaskOwner.objects.get(email=user.email)
-    assignee = Assignee.objects.get(email=user.email)
-    assignments_assigned_to_me = None
-    if assignee:
-        assignments_assigned_to_me = assignee.assignment_set \
-            .all() \
-            .exclude(task_owner=task_owner) \
-            .filter(title__istartswith=title.lower())
+@login_required(login_url='/assignment_system/login')
+def get_assignments_by_assignee_id(request, assignee_id):
+    assignments = filter_by_assignee(assignee_id)
 
-    assignments_created_by_me = Assignment.objects \
-        .filter(task_owner=task_owner) \
-        .filter(title__istartswith=title.lower())
-
-    return {
-        'assignments_created_by_me': assignments_created_by_me,
-        'assignments_assigned_to_me': assignments_assigned_to_me
-    }
+    return HttpResponse(serializers.serialize('json', assignments))
 
 
-def filter_by_description(user, description):
-    task_owner = TaskOwner.objects.get(email=user.email)
-    assignee = Assignee.objects.get(email=user.email)
-    assignments_assigned_to_me = None
-    if assignee:
-        assignments_assigned_to_me = assignee.assignment_set \
-            .all() \
-            .exclude(task_owner=task_owner) \
-            .filter(description__istartswith=description.lower())
-
-    assignments_created_by_me = Assignment.objects \
-        .filter(task_owner=task_owner) \
-        .filter(description__istartswith=description.lower())
-
-    return {
-        'assignments_created_by_me': assignments_created_by_me,
-        'assignments_assigned_to_me': assignments_assigned_to_me
-    }
+@login_required
+def get_assignment_by_id(request, id):
+    assignment = get_object_or_404(Assignment, id=id)
+    return HttpResponse(serializers.serialize('json', [assignment]))
 
 
 @login_required(login_url='/assignment_system/login')
 def assignment_list(request):
     if request.method != 'GET':
         return HttpResponseNotFound('Not found!')
-    user = request.user
 
-    context = None
-    title = request.GET.get('title')
-    description = request.GET.get('description')
-    date = request.GET.get('date')
-    if title:
-        context = filter_by_title(user, title)
-    elif description:
-        context = filter_by_description(user, description)
-    else:
-        context = get_all(user)
+    if request.META['HTTP_ACCEPT'] == 'application/json':
+        return HttpResponse(serializers.serialize('json', Assignment.objects.all()))
 
     return render(
         request,
-        'assignment_system/assignment/assignment_list.html',
-        context
+        'assignment_system/assignment/assignment_list.html'
     )
 
 
 @login_required(login_url='/assignment_system/login')
 def create_assignment(request):
+    user = request.user
+    assignee = Assignee.objects.get(email=user.email)
+    if assignee.role == Assignee.JUST_ASSIGNEE:
+        return HttpResponseForbidden('У вас немає доступу до створення доручень!')
+
     form = AssignmentForm(request.POST or None)
     print(form)
     if form.is_valid():
         assignment = form.save()
-        user = request.user
         task_owner = TaskOwner.objects.get(email=user.email)
         assignment.task_owner = task_owner
         assignment.save()
@@ -168,6 +122,9 @@ def create_assignment(request):
 
 @login_required(login_url='/assignment_system/login')
 def update_assignment(request, id):
+    user = request.user
+    assignee = Assignee.objects.get(email=user.email)
+
     assignment = get_object_or_404(Assignment, id=id)
     form = AssignmentForm(request.POST or None, instance=assignment)
     if form.is_valid():
@@ -177,7 +134,10 @@ def update_assignment(request, id):
     return render(
         request,
         'assignment_system/assignment/assignment_form.html',
-        {'form': form}
+        {
+            'form': form,
+            'just_assignee': assignee.role == Assignee.JUST_ASSIGNEE
+        }
     )
     # return HttpResponse('update')
 
