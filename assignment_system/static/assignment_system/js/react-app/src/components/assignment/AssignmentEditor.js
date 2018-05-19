@@ -17,10 +17,10 @@ class AssignmentsEditor extends Component {
     getTitleSection() {
         const { fields } = this.state.assignment;
         return (
-            <div class="form-group">
+            <div className="form-group">
                 <label for="title">Заголовок</label>
-                <input type="text" class="form-control" id="title" aria-describedby="titleHelp" placeholder="Введіть заголовок" value={fields.title}/>
-                <small id="titleHelp" class="form-text text-muted">короткий опис змісту доручення</small>
+                <input type="text" className="form-control" id="title" aria-describedby="titleHelp" placeholder="Введіть заголовок" value={fields.title}/>
+                <small id="titleHelp" className="form-text text-muted">короткий опис змісту доручення</small>
             </div>
         )
     }
@@ -28,9 +28,9 @@ class AssignmentsEditor extends Component {
     getDescriptionSection() {
         const { fields } = this.state.assignment;
         return (
-            <div class="form-group">
+            <div className="form-group">
                 <label for="description">Опис</label>
-                <textarea class="form-control" id="description" rows="3" value={fields.description}></textarea>
+                <textarea className="form-control" id="description" rows="3" value={fields.description}></textarea>
             </div>
         )
     }
@@ -64,8 +64,12 @@ class AssignmentsEditor extends Component {
     }
 
     getDeadLineSection() {
+        const { fields } = this.state.assignment;
         return (
-            <div>DeadLine</div>
+            <div>
+                <label for="example-datetime-local-input" class="col-2 col-form-label">Date and time</label>
+                <input class="form-control" type="datetime-local" id="deadline"/>
+            </div>
         )
     }
 
@@ -80,6 +84,7 @@ class AssignmentsEditor extends Component {
         console.log('Title:', getElemValue('title'));
         console.log('Description:', getElemContent('description'));
         console.log('Piority lvl:', getElemValue('priorities'));
+        console.log('DeadLine:', getElemValue('deadline'));
     }
 
     render() {
