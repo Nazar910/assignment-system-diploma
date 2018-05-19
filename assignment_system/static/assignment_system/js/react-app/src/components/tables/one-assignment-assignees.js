@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import dateformat from 'dateformat';
+import Loader from '../Loader';
 import { 
     getAssignment,
     getAssignmentAssignees,
@@ -139,7 +140,7 @@ class OneAssignmentAssignees extends Component {
                 }
                 {
                     isLoading ? 
-                    <div id="loading"></div> :
+                    <Loader /> :
                     <div>
                         <table className="table table-bordered">
                             <tr>

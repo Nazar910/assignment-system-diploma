@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import dateformat from 'dateformat';
 import { getList, getEventsFinished, getEventsStarted } from '../../api';
+import Loader from '../Loader';
 
 const PAGE_SIZE = 3;
 
@@ -144,7 +145,7 @@ class AssignmentAssignee extends Component {
             return;
         }
 
-        if (page > this.state.assignments.length / PAGE_SIZE) {
+        if (page > (this.state.assignments.length - 1) / PAGE_SIZE) {
             return;
         }
 
@@ -196,7 +197,7 @@ class AssignmentAssignee extends Component {
         const { isLoading } = this.state;
         return (<div>
             {isLoading ?
-            <div id="loading"></div> :
+            <Loader /> :
             <div>
                 Статус виконання доручень за 
                 <select onChange={this.onSelectedTimeChange.bind(this)}>

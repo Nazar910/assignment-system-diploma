@@ -31,6 +31,10 @@ export async function getOne(resourceType, id) {
     return (await get(`${resourceType}/${id}`))[0];
 }
 
+export function getAssignments() {
+    return getList('assignments');
+}
+
 export async function getAssignment(id) {
     try {
         return await getOne('assignments', id);

@@ -3,8 +3,7 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 module.exports = {
   entry: {
-    'index': ['babel-polyfill','./src/index.js'],
-    'assignment-list-page': './src/assignment.js'
+    'index': ['babel-polyfill','./src/index.js']
   },
   module: {
     rules: [

@@ -1,6 +1,8 @@
 {% extends 'assignment_system/layout.html' %}
 {% block content %}
-<div id="assignment-list-page"></div>
+<div id="assignment-editor-page"></div>
+<div id="assignment" hidden>{{assignment}}</div>
+<div id="priorities" hidden>{{priorities}}</div>
 {% load static %}
 <script type="text/javascript" src="{% static 'assignment_system/js/react-app/dist/index.js' %}"></script>
 {% endblock %}
