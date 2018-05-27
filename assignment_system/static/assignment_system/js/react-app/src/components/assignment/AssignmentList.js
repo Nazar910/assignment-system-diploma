@@ -55,8 +55,6 @@ class AssignmentsList extends Component {
                     isLoading ?
                     <Loader /> :
                     <div>
-                        filter search (by different criteria)
-                        sort asc/desc
                         <div className="list-group list-custom">{this.getAssignmentsList.call(this)}</div>
                     </div>
                 }

@@ -10,6 +10,8 @@ class AssignmentsEditor extends Component {
 
         this.state = {
             assignment: getHiddenvar('assignment')[0],
+            assignees: getHiddenvar('assignees'),
+            selected_assignees: getHiddenvar('selected_assignees'),
             priorities: getHiddenvar('priorities')
         };
     }
@@ -36,8 +38,32 @@ class AssignmentsEditor extends Component {
     }
     
     getAssigneesSection() {
+        const { assignees, selected_assignees } = this.state;
+        const options = [];
+        for (const a of assignees) {
+            const { name, last_name, email } = a.fields;
+
+            let option = '';
+
+            if (selected_assignees.find(s_a => s_a.fields.email === email)) {
+                option = <option value={email} selected>
+                            {name} {last_name}
+                        </option>
+            } else {
+                option = <option value={email}>
+                            {name} {last_name}
+                        </option>
+            }
+
+            options.push(option);
+        }
         return (
-            <div>Assigneeeeees</div>
+            <div className="form-group">
+                <label for="assignees">Виконавці</label>
+                <select multiple className="form-control" id="assignees">
+                    {options}
+                </select>
+            </div>
         )
     }
 
@@ -54,7 +80,7 @@ class AssignmentsEditor extends Component {
         }
 
         return (
-            <div>
+            <div className="form-group">
                 <label for="priorities">Пріорітет</label>
                 <select className="form-control" id="priorities">
                     {options}
@@ -67,7 +93,7 @@ class AssignmentsEditor extends Component {
         const { fields } = this.state.assignment;
         return (
             <div>
-                <label for="example-datetime-local-input" class="col-2 col-form-label">Date and time</label>
+                <label for="deadline" class="col-2 col-form-label">Дата закінчення: </label>
                 <input class="form-control" type="datetime-local" id="deadline"/>
             </div>
         )

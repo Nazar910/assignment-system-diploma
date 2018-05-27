@@ -30,6 +30,8 @@ def get_assignment_by_id(request, id):
 
     assignment = get_object_or_404(Assignment, id=id)
     serialized = serializers.serialize('json', [assignment])
+    assignees_serialized = serializers.serialize('json', Assignee.objects.all())
+    selected_assignees_serialized = serializers.serialize('json', assignment.assignees.all())
 
     if accept == 'application/json':
         return HttpResponse(serialized)
@@ -40,6 +42,8 @@ def get_assignment_by_id(request, id):
             'assignment_system/assignment/assignment_editor.html',
             {
                 'assignment': serialized,
+                'assignees': assignees_serialized,
+                'selected_assignees': selected_assignees_serialized,
                 'priorities': json.dumps(dict((y, x) for x, y in Assignment.PRIORITIES))
             }
         )
@@ -56,7 +60,8 @@ def assignment_list(request):
     if accept == 'application/json':
         user = request.user
         assignee = get_object_or_404(Assignee, email=user.email)
-        assignments = get_list_or_404(Assignment, author_id=assignee.id)
+        # assignments = get_list_or_404(Assignment, author_id=assignee.id)
+        assignments = Assignment.objects.all()
 
         return HttpResponse(serializers.serialize('json', assignments))
 

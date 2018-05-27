@@ -10,9 +10,11 @@ class AssignmentsItem extends Component {
 
     render() {
         const { assignment } = this.props;
+        const { pk } = assignment;
+        const { title } = assignment.fields;
         return (
                 <a href={ "assignments/" + assignment.pk} className="list-group-item">
-                    {assignment.fields.title}
+                    {`№ ${pk}: ${title}`}
                 </a>
         )
     }
