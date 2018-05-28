@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { updateAssignment } from '../../api/index';
+import $ from 'jquery';
 
 const getElemValue = id => document.getElementById(id).value;
 const getElemContent = id => document.getElementById(id).innerHTML;
@@ -16,23 +18,34 @@ class AssignmentsEditor extends Component {
         };
     }
 
-    getTitleSection() {
+    componentDidMount() {
+        const { selected_assignees } = this.state;
         const { fields } = this.state.assignment;
+        $('#title').val(fields.title);
+        $('#description').val(fields.description);
+        const deadline = fields.deadline.replace('Z', '')
+        $('input#deadline').val(deadline);
+
+        for (const s_a of selected_assignees) {
+            $(`select#assignees_select option[value="${s_a.pk}"]`)[0].selected = true;
+        }
+    }
+
+    getTitleSection() {
         return (
             <div className="form-group">
                 <label for="title">Заголовок</label>
-                <input type="text" className="form-control" id="title" aria-describedby="titleHelp" placeholder="Введіть заголовок" value={fields.title}/>
+                <input type="text" className="form-control" id="title" aria-describedby="titleHelp" placeholder="Введіть заголовок"/>
                 <small id="titleHelp" className="form-text text-muted">короткий опис змісту доручення</small>
             </div>
         )
     }
 
     getDescriptionSection() {
-        const { fields } = this.state.assignment;
         return (
             <div className="form-group">
                 <label for="description">Опис</label>
-                <textarea className="form-control" id="description" rows="3" value={fields.description}></textarea>
+                <textarea className="form-control" id="description" rows="3"></textarea>
             </div>
         )
     }
@@ -41,16 +54,16 @@ class AssignmentsEditor extends Component {
         const { assignees, selected_assignees } = this.state;
         const options = [];
         for (const a of assignees) {
-            const { name, last_name, email } = a.fields;
+            const { name, last_name } = a.fields;
 
             let option = '';
 
-            if (selected_assignees.find(s_a => s_a.fields.email === email)) {
-                option = <option value={email} selected>
+            if (selected_assignees.find(s_a => s_a.pk === a.pk)) {
+                option = <option key={a.pk} value={a.pk} selected="selected">
                             {name} {last_name}
                         </option>
             } else {
-                option = <option value={email}>
+                option = <option key={a.pk} value={a.pk}>
                             {name} {last_name}
                         </option>
             }
@@ -59,8 +72,8 @@ class AssignmentsEditor extends Component {
         }
         return (
             <div className="form-group">
-                <label for="assignees">Виконавці</label>
-                <select multiple className="form-control" id="assignees">
+                <label for="assignees_select">Виконавці</label>
+                <select multiple className="form-control" id="assignees_select">
                     {options}
                 </select>
             </div>
@@ -68,15 +81,22 @@ class AssignmentsEditor extends Component {
     }
 
     getPriorityLvlSection() {
-        const { priorities } = this.state;
+        const { priorities, assignment } = this.state;
         const options = [];
 
         const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
         for (const name of Object.keys(priorities)) {
-            options.push(
-                <option value={priorities[name]}>{capitalize(name)}</option>
-            )
+            if (assignment.fields.priority_level === priorities[name]) {
+                options.push(
+                    <option selected value={priorities[name]}>{capitalize(name)}</option>
+                )
+            }
+            else {
+                options.push(
+                    <option value={priorities[name]}>{capitalize(name)}</option>
+                )
+            }
         }
 
         return (
@@ -90,27 +110,30 @@ class AssignmentsEditor extends Component {
     }
 
     getDeadLineSection() {
-        const { fields } = this.state.assignment;
         return (
             <div>
-                <label for="deadline" class="col-2 col-form-label">Дата закінчення: </label>
-                <input class="form-control" type="datetime-local" id="deadline"/>
+                <label for="deadline" className="col-2 col-form-label">Дата закінчення: </label>
+                <input className="form-control" type="datetime-local" id="deadline"/>
             </div>
-        )
-    }
-
-    getAttachmentsSection() {
-        return (
-            <div>Attachments</div>
         )
     }
 
     onSubmit(e) {
         e.preventDefault();
         console.log('Title:', getElemValue('title'));
-        console.log('Description:', getElemContent('description'));
+        console.log('Description:', $('textarea#description').val());
         console.log('Piority lvl:', getElemValue('priorities'));
-        console.log('DeadLine:', getElemValue('deadline'));
+        console.log('DeadLine:', $('input#deadline').val());
+        console.log('Assignees:', $('#assignees_select').val());
+        const body = {
+            title: getElemValue('title'),
+            description: $('textarea#description').val(),
+            priority: getElemValue('priorities'),
+            deadline: getElemValue('deadline'),
+            assignees: $('#assignees_select').val()
+        }
+        const id = this.state.assignment.pk;
+        updateAssignment(id, body);
     }
 
     render() {
@@ -122,8 +145,7 @@ class AssignmentsEditor extends Component {
                     {this.getAssigneesSection.call(this)}
                     {this.getPriorityLvlSection.call(this)}
                     {this.getDeadLineSection.call(this)}
-                    {this.getAttachmentsSection.call(this)}
-                    <button type="submit" class="btn btn-primary" onClick={this.onSubmit}>Підтвердити</button>
+                    <button type="submit" class="btn btn-primary" onClick={this.onSubmit.bind(this)}>Підтвердити</button>
                 </form>
             </div>
         )

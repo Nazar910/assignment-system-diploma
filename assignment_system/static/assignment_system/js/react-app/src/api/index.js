@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cookies from 'js-cookie';
 
-async function get(url) {
+async function makeRequest(url, method, body) {
     return (
         await axios({
             url: `/assignment_system/${url}`,
@@ -9,7 +9,39 @@ async function get(url) {
                 'X-CSRFToken': cookies.get('csrftoken'),
                 'Accept': 'application/json'
             },
-            method: 'GET'
+            method
+        })
+    ).data;
+}
+
+function get(url) {
+    return makeRequest(url, 'GET');
+}
+
+export async function createAssignment(body) {
+    return (
+        await axios({
+            url: '/assignment_system/assignments/new', 
+            data: body,
+            headers: {
+                'X-CSRFToken': cookies.get('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            method: 'POST'
+        })
+    ).data;
+}
+
+export async function updateAssignment(id, body) {
+    return (
+        await axios({
+            url: '/assignment_system/assignments/edit/' + id, 
+            data: body,
+            headers: {
+                'X-CSRFToken': cookies.get('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            method: 'POST'
         })
     ).data;
 }
