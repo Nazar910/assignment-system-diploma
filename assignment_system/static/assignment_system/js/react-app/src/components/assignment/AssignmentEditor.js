@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { updateAssignment } from '../../api/index';
+import { updateAssignment, createAssignment } from '../../api/index';
 import $ from 'jquery';
 
 const getElemValue = id => document.getElementById(id).value;
@@ -11,6 +11,7 @@ class AssignmentsEditor extends Component {
         super(props);
 
         this.state = {
+            is_new: getHiddenvar('is_new'),
             assignment: getHiddenvar('assignment')[0],
             assignees: getHiddenvar('assignees'),
             selected_assignees: getHiddenvar('selected_assignees'),
@@ -19,11 +20,15 @@ class AssignmentsEditor extends Component {
     }
 
     componentDidMount() {
+        if (this.state.is_new) {
+            return;
+        }
+
         const { selected_assignees } = this.state;
         const { fields } = this.state.assignment;
         $('#title').val(fields.title);
         $('#description').val(fields.description);
-        const deadline = fields.deadline.replace('Z', '')
+        const deadline = (fields.deadline || '').replace('Z', '')
         $('input#deadline').val(deadline);
 
         for (const s_a of selected_assignees) {
@@ -87,7 +92,7 @@ class AssignmentsEditor extends Component {
         const capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase();
 
         for (const name of Object.keys(priorities)) {
-            if (assignment.fields.priority_level === priorities[name]) {
+            if (assignment && assignment.fields.priority_level === priorities[name]) {
                 options.push(
                     <option selected value={priorities[name]}>{capitalize(name)}</option>
                 )
@@ -132,6 +137,13 @@ class AssignmentsEditor extends Component {
             deadline: getElemValue('deadline'),
             assignees: $('#assignees_select').val()
         }
+
+        if (this.state.is_new) {
+            console.log('About to create one');
+            createAssignment(body).then(([data]) => window.location.href = '/assignment_system/assignments/edit/' + data.pk);
+            return;
+        }
+
         const id = this.state.assignment.pk;
         updateAssignment(id, body);
     }
@@ -145,7 +157,7 @@ class AssignmentsEditor extends Component {
                     {this.getAssigneesSection.call(this)}
                     {this.getPriorityLvlSection.call(this)}
                     {this.getDeadLineSection.call(this)}
-                    <button type="submit" class="btn btn-primary" onClick={this.onSubmit.bind(this)}>Підтвердити</button>
+                    <button type="submit" className="btn btn-primary" onClick={this.onSubmit.bind(this)}>Підтвердити</button>
                 </form>
             </div>
         )

@@ -3,12 +3,12 @@ from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidde
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from datetime import datetime
 from django.core import serializers
+from datetime import datetime
+import pytz
+import json
 
 from assignment_system.models import Assignment, Assignee
-
-import json
 
 
 def filter_by_assignee(assignee_id):
@@ -41,6 +41,7 @@ def get_assignment_by_id(request, id):
             request,
             'assignment_system/assignment/assignment_editor.html',
             {
+                'is_new': 'false',
                 'assignment': serialized,
                 'assignees': assignees_serialized,
                 'selected_assignees': selected_assignees_serialized,
@@ -76,26 +77,50 @@ def assignment_list(request):
 
 @login_required(login_url='/assignment_system/login')
 def create_assignment(request):
-    if request.method != 'POST':
-        return HttpResponseNotFound('Not found')
-
     user = request.user
     assignee = Assignee.objects.get(email=user.email)
     if assignee.role == Assignee.JUST_ASSIGNEE:
         return HttpResponseForbidden('У вас немає доступу до створення доручень!')
 
-    accept = request.META['HTTP_ACCEPT']
-    if 'text/html' in accept:
+    if request.method == 'GET':
+        assignees_serialized = serializers.serialize('json', Assignee.objects.all())
         return render(
             request,
             'assignment_system/assignment/assignment_editor.html',
             {
-                'is_new': 'true'
+                'is_new': 'true',
+                'assignment': [],
+                'assignees': assignees_serialized,
+                'selected_assignees': [],
+                'priorities': json.dumps(dict((y, x) for x, y in Assignment.PRIORITIES))
             }
         )
 
-    print('Request body is', json.loads(request.body))
-    return HttpResponseNotFound('Not found!')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        print('Request body is', data)
+        now = datetime.now(tz=pytz.utc)
+        assignment = Assignment(
+            title=data['title'],
+            description=data['description'],
+            priority_level=data['priority'],
+            assigned_at=now
+        )
+
+        if data['deadline'] != '':
+            assignment.deadline = data['deadline']
+
+        assignment.save()
+
+        for assignee_id in data['assignees']:
+            assignee = get_object_or_404(Assignee, id=assignee_id)
+            assignment.assignees.add(assignee)
+
+        assignment.save()
+        serialized = serializers.serialize('json', [assignment])
+        return HttpResponse(serialized)
+
+    return HttpResponseNotFound('Not found')
 
 
 @login_required(login_url='/assignment_system/login')
@@ -108,16 +133,11 @@ def update_assignment(request, id):
     if assignee.role == Assignee.JUST_ASSIGNEE:
         return HttpResponseForbidden('У вас немає доступу до створення доручень!')
 
-    print('This is update')
-    print('Request body is', json.loads(request.body))
     data = json.loads(request.body)
     assignment = get_object_or_404(Assignment, id=id)
     assignment.title = data['title']
     assignment.description = data['description']
-    print('Priority before', assignment.priority_level)
-    print('Priority data["priority"]', data['priority'])
     assignment.priority_level = data['priority']
-    print('Priority after', assignment.priority_level)
 
     if data['deadline'] != '':
         assignment.deadline = data['deadline']

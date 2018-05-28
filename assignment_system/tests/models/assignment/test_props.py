@@ -28,8 +28,6 @@ class AssignmentTestCase(TestCase):
             title=title,
             description=description,
             assigned_at=assigned_at,
-            started_at=started_at,
-            finished_at=finished_at
         )
         stored_assignment.save()
         stored_assignment.assignees.add(self.assignee)
@@ -41,5 +39,3 @@ class AssignmentTestCase(TestCase):
         self.assertEqual(assignment.priority_level, Assignment.LOW_PRIORITY)
         self.assertIn(self.assignee, assignment.assignees.all())
         self.assertEqual(assignment.assigned_at, assigned_at)
-        self.assertEqual(assignment.started_at, started_at)
-        self.assertEqual(assignment.finished_at, finished_at)

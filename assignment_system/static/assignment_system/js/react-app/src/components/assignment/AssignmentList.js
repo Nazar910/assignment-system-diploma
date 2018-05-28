@@ -47,6 +47,10 @@ class AssignmentsList extends Component {
         });
     }
 
+    create() {
+        window.location.href = '/assignment_system/assignments/new';
+    }
+
     render() {
         const { isLoading } = this.state;
         return (
@@ -55,6 +59,7 @@ class AssignmentsList extends Component {
                     isLoading ?
                     <Loader /> :
                     <div>
+                        <a className="btn btn-primary" href="/assignment_system/assignments/new">Створити доручення</a>
                         <div className="list-group list-custom">{this.getAssignmentsList.call(this)}</div>
                     </div>
                 }
