@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 
 class Loader extends Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props) {
+        super(props);
 
-        this.state = {}
+        this.state = {};
     }
 
     render() {

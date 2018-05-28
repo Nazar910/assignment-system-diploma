@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Messages from '../messages/Messages';
 import { updateAssignment, createAssignment } from '../../api/index';
 import $ from 'jquery';
 
@@ -158,6 +159,8 @@ class AssignmentsEditor extends Component {
                     {this.getPriorityLvlSection.call(this)}
                     {this.getDeadLineSection.call(this)}
                     <button type="submit" className="btn btn-primary" onClick={this.onSubmit.bind(this)}>Підтвердити</button>
+                    <h5>Повідомлення</h5>
+                    <Messages />
                 </form>
             </div>
         )
