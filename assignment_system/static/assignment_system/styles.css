@@ -10,3 +10,14 @@ form {
 .one-assignment-table-trs:hover {
     background-color: lightblue
 }
+
+.list-custom {
+    float: none;
+    margin: 0 auto;
+    width: 85%;
+}
+
+.list-editor {
+    height: auto;
+    float: left;
+}

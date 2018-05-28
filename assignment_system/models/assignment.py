@@ -35,8 +35,6 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(blank=True, null=True)
 
-    attachment = models.FileField(blank=True, null=True)
-
     def __str__(self):
         return self.title
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import dateformat from 'dateformat';
 import { getList, getEventsFinished, getEventsStarted } from '../../api';
+import Loader from '../Loader';
 
 const PAGE_SIZE = 3;
 
@@ -107,18 +108,22 @@ class AssignmentAssignee extends Component {
                 {this.getCurrentAssignmentsBatch().map(a => {
                     const { onEnter, onLeave } = onMouseFuncs(key.pk, a.pk);
                     if (value.has(a)) {
+                        console.log('Assignee', key);
                         const { deadline = 'Без дедлайну' } = a;
-                        const finished_assignment = assignments_finished.find(af => af.fields.assignee === key.pk);
+                        const finished_assignment = assignments_finished.find(af => af.fields.assignee === key.pk && a.pk === af.fields.assignment);
                         if (finished_assignment) {
+                            console.log('Finished', finished_assignment);
                             const onClick = () => alert('Дедлайн: ' + deadline + '\nЗакінчено: ' + finished_assignment.fields.date);
                             return <td id={`assignee-${key.pk}-assignment-${a.pk}`}><div onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>V</div></td>
                         }
 
-                        const started_assignment = assignments_started.find(af => af.fields.assignee === key.pk);
+                        const started_assignment = assignments_started.find(af => af.fields.assignee === key.pk && a.pk === af.fields.assignment);
                         if (started_assignment) {
                             const onClick = () => alert('Дедлайн: ' + deadline + '\nВиконується з: ' + started_assignment.fields.date);
                             return <td id={`assignee-${key.pk}-assignment-${a.pk}`}><div onClick={onClick} onMouseEnter={onEnter} onMouseLeave={onLeave}>Виконується</div></td>
                         }
+
+                        return <td id={`assignee-${key.pk}-assignment-${a.pk}`} onMouseEnter={onEnter} onMouseLeave={onLeave}>_</td>
 
                     }
                     return <td id={`assignee-${key.pk}-assignment-${a.pk}`} onMouseEnter={onEnter} onMouseLeave={onLeave}> </td>
@@ -144,7 +149,7 @@ class AssignmentAssignee extends Component {
             return;
         }
 
-        if (page > this.state.assignments.length / PAGE_SIZE) {
+        if (page > (this.state.assignments.length - 1) / PAGE_SIZE) {
             return;
         }
 
@@ -196,7 +201,7 @@ class AssignmentAssignee extends Component {
         const { isLoading } = this.state;
         return (<div>
             {isLoading ?
-            <div id="loading"></div> :
+            <Loader /> :
             <div>
                 Статус виконання доручень за 
                 <select onChange={this.onSelectedTimeChange.bind(this)}>
