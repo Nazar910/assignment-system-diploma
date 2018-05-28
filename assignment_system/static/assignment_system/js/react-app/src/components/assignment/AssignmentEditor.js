@@ -160,7 +160,7 @@ class AssignmentsEditor extends Component {
                     {this.getDeadLineSection.call(this)}
                     <button type="submit" className="btn btn-primary" onClick={this.onSubmit.bind(this)}>Підтвердити</button>
                     <h5>Повідомлення</h5>
-                    <Messages />
+                    <Messages assignment_id={this.state.assignment.pk}/>
                 </form>
             </div>
         )

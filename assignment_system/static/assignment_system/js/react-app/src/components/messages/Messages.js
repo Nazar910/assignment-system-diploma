@@ -3,81 +3,53 @@ import dateformat from 'dateformat';
 import Loader from '../Loader';
 import MessageList from './MessageList';
 import $ from 'jquery';
-
-function createMessage(messageBody) {
-    return new Promise(resolve => {
-        resolve({
-            pk: Math.floor(Math.random() * 100),
-            fields: {
-                text: messageBody.text,
-                author_id: 5,
-                author_full_name: 'Mr Johns',
-                created_at: dateformat(new Date(), 'dd.mm.yyyy' )
-            }
-        });
-    });
-}
+import { createMessage, getMessagesByAssignmentId } from '../../api/index'
 
 class Messages extends Component {
     constructor(props) {
         super(props);
 
-        const stubMessages = [
-            {
-                pk: 1,
-                fields: {
-                    text: 'Blah-blah',
-                    author_id: 5,
-                    author_full_name: 'Mr Johns',
-                    created_at: dateformat(new Date(), 'dd.mm.yyyy' )
-                }
-            },
-            {
-                pk: 2,
-                fields: {
-                    text: 'Ye, you\'re right!',
-                    author_id: 5,
-                    author_full_name: 'Mr Johns',
-                    created_at: dateformat(new Date(), 'dd.mm.yyyy' )
-                }
-            }
-        ];
-
         this.state = {
             messages: [],
             isLoading: true,
-            assignment_id: props.assignment_id, 
-            stubMessages
+            assignment_id: props.assignment_id
         }
-    }
-
-    getMessages(assignment_id) {
-        return new Promise(resolve => setTimeout(() => resolve(this.state.stubMessages), 500))
     }
 
     componentDidMount() {
         const { assignment_id } = this.state;
 
-        this.getMessages(assignment_id)
+        getMessagesByAssignmentId(assignment_id)
             .then(messages => {
                 this.setState({
                     messages,
                     isLoading: false
                 })
             })
+            .catch(err => {
+                console.log(err.messages_404);
+                if (err.messages_404) {
+                    this.setState({
+                        isLoading: false
+                    });
+                }
+            })
     }
 
     addNewMessage(e) {
         e.preventDefault();
-        const messageBody = {
-            text: $('input#new_message').val()
-        }
-        createMessage(messageBody)
-            .then(message => {
+        console.log('Button clicked');
+        const text = $('input#new_message').val();
+        const file = $('input#new_message_file')[0].files[0];
+        const { assignment_id } = this.state;
+        createMessage(text, assignment_id, file)
+            .then((message) => {
+                console.log(message);
                 const { messages } = this.state;
                 messages.push(message);
                 this.setState({ messages });
                 $('input#new_message').val('');
+                $('input#new_message_file').val('');
             })
     }
 
@@ -91,6 +63,7 @@ class Messages extends Component {
                         <form>
                             <input type="text" className="form-control" id="new_message" aria-describedby="message_help" placeholder="Введіть повідомлення"/>
                             <small id="message_help" className="form-text text-muted">Ваше повідомлення</small>
+                            <input type="file" className="form-control-file" id="new_message_file"/>
                             <button className="btn btn-primary" onClick={this.addNewMessage.bind(this)}>Написати</button>
                         </form>
                         <br />

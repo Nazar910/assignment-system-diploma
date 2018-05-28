@@ -32,6 +32,46 @@ export async function createAssignment(body) {
     ).data;
 }
 
+export function getFile(message_id) {
+    return get('files/' + message_id);
+}
+
+export async function getMessagesByAssignmentId(assignment_id) {
+    try {
+        return await get('messages/assignment/' + assignment_id);
+    } catch (e) {
+        console.log('Error', e);
+        if (e.response.status === 404) {
+            e.messages_404 = true;
+            throw e;
+        }
+        throw e;
+    }
+}
+
+export async function createMessage(text, assignment_id, file) {
+    console.log('About to create message');
+    const data = new FormData();
+    data.append('text', text);
+    data.append('assignment_id', assignment_id);
+
+    if (file) {
+        data.append('file', file);
+    }
+
+    return (
+        await axios({
+            url: `/assignment_system/messages/new`, 
+            data,
+            headers: {
+                'X-CSRFToken': cookies.get('csrftoken'),
+                'Content-Type': 'multipart/form-data'
+            },
+            method: 'POST'
+        })
+    ).data[0];
+}
+
 export async function updateAssignment(id, body) {
     return (
         await axios({

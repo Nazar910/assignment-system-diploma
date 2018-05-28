@@ -71,6 +71,15 @@ assignments_started_urlpatterns = [
         )
 ]
 
+messages_urlpatterns = [
+        path('messages/new', views.create_message, name='create_message'),
+        path('messages/assignment/<int:id>', views.get_messages_by_assigmnent_id, name='get_messages_by_assignment_id'),
+]
+
+files_urlpatterns = [
+        path('files/<int:message_id>', views.download_file, name='download_file'),       
+]
+
 urlpatterns = [
         path('', views.index, name='index'),
         path('home', views.home, name='home'),
@@ -93,4 +102,6 @@ urlpatterns = [
 ] + assignee_urlpatterns \
  + assignment_urlpatterns \
  + assignments_finished_urlpatterns \
- + assignments_started_urlpatterns
+ + assignments_started_urlpatterns \
+ + messages_urlpatterns \
+ + files_urlpatterns
